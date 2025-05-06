@@ -1326,105 +1326,61 @@
 
     // Initialize game state from save or defaults
     function initializeGame() {
-      console.log('Initializing game...');
-      try {
-        const savedState = localStorage.getItem('sneakerHustleGameState');
-        console.log('Raw saved state:', savedState ? (savedState.length > 100 ? savedState.substring(0, 100) + '...' : savedState) : 'null');
-        
-        if (savedState) {
-          try {
-            console.log('Found saved game state, loading...');
-            const gameState = JSON.parse(savedState);
-            console.log('Parsed state contains:', Object.keys(gameState).join(', '));
-            
-            // Restore basic values
-            coins = gameState.coins ?? 1000;
-            console.log('Loaded coins:', coins);
-            
-            inventory = gameState.inventory || [];
-            console.log('Loaded inventory count:', inventory.length);
-            
-            purchaseHistory = gameState.purchaseHistory || [];
-            
-            // Restore clickCount
-            if (gameState.clickCount !== undefined) {
-              clickCount = gameState.clickCount;
-              if (document.querySelector('.click-count')) {
-                document.querySelector('.click-count').textContent = `Clicks: ${clickCount}`;
-              }
-            }
-            
-            // Restore settings
-            if (gameState.settings) {
-              settings = {...settings, ...gameState.settings};
-            }
-            
-            // Restore market buyer
-            if (gameState.currentMarketBuyer) {
-              currentMarketBuyer = gameState.currentMarketBuyer;
-            }
-            
-            // Restore limited offers
-            if (gameState.limitedOffers) {
-              try {
-                limitedOffers = new Map(gameState.limitedOffers);
-              } catch (e) {
-                console.error('Error restoring limitedOffers:', e);
-                limitedOffers = new Map(); // Reset if error
-              }
-            }
-            
-            // Restore multipliers
-            if (gameState.activeMultipliers) {
-              window.globalMultiplier = gameState.activeMultipliers.global;
-              window.brandMultipliers = gameState.activeMultipliers.brand;
-              window.coinMultiplier = gameState.activeMultipliers.coin;
-            }
-            
-            // Restore trader state
-            if (gameState.currentTrader) {
-              window.currentTrader = gameState.currentTrader;
-              window.lastTraderResponse = gameState.lastTraderResponse;
-            }
-            if (gameState.hiredStaff) {
-              hiredStaff = gameState.hiredStaff;
-            }
-            if (gameState.resellAgentLevel !== undefined) {
-              resellAgent.level = gameState.resellAgentLevel;
-            }
-            if (gameState.storageUpgrades !== undefined) {
-              storageUpgrades = gameState.storageUpgrades;
-            }
-            if (gameState.storageCost !== undefined) {
-              storageCost = gameState.storageCost;
-            }
-            console.log('Game state loaded successfully');
-          } catch (error) {
-            console.error('Error parsing game state:', error);
-            // Try to recover from basicState fallback
-            try {
-              const basicState = localStorage.getItem('sneakerHustleGameStateBasic');
-              if (basicState) {
-                const basicData = JSON.parse(basicState);
-                coins = basicData.coins;
-                if (basicData.resellAgentLevel !== undefined) {
-                  resellAgent.level = basicData.resellAgentLevel;
-                }
-                console.log('Recovered from basic state fallback');
-              } else {
-                setDefaultState();
-              }
-            } catch (e) {
-              console.error('Fallback recovery failed:', e);
-              setDefaultState();
-            }
+      const savedState = localStorage.getItem('sneakerHustleGameState');
+      
+      if (savedState) {
+        try {
+          const gameState = JSON.parse(savedState);
+          
+          // Restore basic values
+          coins = gameState.coins ?? 10000;
+          inventory = gameState.inventory || [];
+          purchaseHistory = gameState.purchaseHistory || [];
+          
+          // Restore settings
+          if (gameState.settings) {
+            settings = {...settings, ...gameState.settings};
           }
-        } else {
-          console.log('No saved game state found, setting defaults');
+          
+          // Restore market buyer
+          if (gameState.currentMarketBuyer) {
+            currentMarketBuyer = gameState.currentMarketBuyer;
+          }
+          
+          // Restore limited offers
+          if (gameState.limitedOffers) {
+            limitedOffers = new Map(gameState.limitedOffers);
+        }
+          
+          // Restore multipliers
+          if (gameState.activeMultipliers) {
+            window.globalMultiplier = gameState.activeMultipliers.global;
+            window.brandMultipliers = gameState.activeMultipliers.brand;
+            window.coinMultiplier = gameState.activeMultipliers.coin;
+          }
+          
+          // Restore trader state
+          if (gameState.currentTrader) {
+            window.currentTrader = gameState.currentTrader;
+            window.lastTraderResponse = gameState.lastTraderResponse;
+          }
+          if (gameState.hiredStaff) {
+            hiredStaff = gameState.hiredStaff;
+          }
+          if (gameState.resellAgentLevel !== undefined) {
+            resellAgent.level = gameState.resellAgentLevel;
+          }
+          if (gameState.storageUpgrades !== undefined) {
+            storageUpgrades = gameState.storageUpgrades;
+          }
+          if (gameState.storageCost !== undefined) {
+            storageCost = gameState.storageCost;
+          }
+        } catch (error) {
+          console.error('Error loading game state:', error);
           setDefaultState();
         }
-      } catch (error) {
-        console.error('Critical error in initializeGame:', error);
+        } else {
         setDefaultState();
       }
       
@@ -1432,9 +1388,6 @@
       updateAllDisplays();
       updateStorageDisplay();
       if (typeof updateStaffDisplay === 'function') updateStaffDisplay();
-      
-      // Mark initialization as complete
-      window.gameInitialized = true;
     }
 
     // Set default state for new games
@@ -1478,124 +1431,40 @@
 
     // Save game state
     function saveGameState() {
-      try {
-        const gameState = {
-          coins,
-          inventory,
-          purchaseHistory,
-          settings,
-          currentMarketBuyer,
-          limitedOffers: Array.from(limitedOffers.entries()),
-          activeMultipliers: {
-            global: window.globalMultiplier || 1,
-            brand: window.brandMultipliers || {},
-            coin: window.coinMultiplier || 1
-          },
-          currentTrader: window.currentTrader,
-          lastTraderResponse: window.lastTraderResponse,
-          hiredStaff,
-          resellAgentLevel: resellAgent.level,
-          storageUpgrades,
-          storageCost,
-          clickCount
-        };
-        
-        // Debugging check for circular references
-        try {
-          // Test stringify first
-          JSON.stringify(gameState);
-        } catch (jsonError) {
-          console.error('Error stringifying game state:', jsonError);
-          // Try to identify the problematic property
-          for (let key in gameState) {
-            try {
-              JSON.stringify(gameState[key]);
-            } catch (e) {
-              console.error(`Problem with property ${key}:`, e);
-              // Make a simpler version of that property
-              if (key === 'inventory') {
-                gameState.inventory = gameState.inventory.map(item => ({
-                  id: item.id,
-                  brand: item.brand,
-                  model: item.model,
-                  colorway: item.colorway,
-                  rarity: item.rarity,
-                  baseValue: item.baseValue
-                }));
-              } else if (key === 'limitedOffers') {
-                gameState.limitedOffers = [];
-              }
-            }
-          }
-        }
-
-        const gameStateString = JSON.stringify(gameState);
-        
-        // Actually save to localStorage
-        localStorage.setItem('sneakerHustleGameState', gameStateString);
-        
-        // Verify it was saved properly
-        const savedState = localStorage.getItem('sneakerHustleGameState');
-        if (!savedState) {
-          console.error('Storage verification failed: State wasn\'t saved!');
-          return false;
-        }
-        
-        // Check if too large (localStorage limit is ~5MB)
-        console.log('Game state size:', Math.round(gameStateString.length / 1024), 'KB');
-        if (gameStateString.length > 4 * 1024 * 1024) {
-          console.warn('Game state is very large! May hit localStorage limits soon.');
-        }
-        
-        return true;
-      } catch (error) {
-        console.error('Error saving game state:', error);
-        // Try a simpler save as fallback
-        try {
-          const basicState = JSON.stringify({ coins, resellAgentLevel: resellAgent.level });
-          localStorage.setItem('sneakerHustleGameStateBasic', basicState);
-          console.log('Saved basic state as fallback');
-        } catch (e) {
-          console.error('Even basic save failed:', e);
-        }
-        return false;
-      }
+      const gameState = {
+        coins,
+        inventory,
+        purchaseHistory,
+        settings,
+        currentMarketBuyer,
+        limitedOffers: Array.from(limitedOffers.entries()),
+        activeMultipliers: {
+          global: window.globalMultiplier || 1,
+          brand: window.brandMultipliers || {},
+          coin: window.coinMultiplier || 1
+        },
+        currentTrader: window.currentTrader,
+        lastTraderResponse: window.lastTraderResponse,
+        hiredStaff,
+        resellAgentLevel: resellAgent.level,
+        storageUpgrades,
+        storageCost
+      };
+      
+      localStorage.setItem('sneakerHustleGameState', JSON.stringify(gameState));
     }
 
     // Initialize when the page loads
     window.addEventListener('load', () => {
-      console.log('Page loaded, initializing game');
-      
-      // Test if localStorage is working
-      try {
-        localStorage.setItem('sneakerHustleTest', 'test');
-        const test = localStorage.getItem('sneakerHustleTest');
-        if (test !== 'test') {
-          console.error('localStorage test failed!');
-          alert('Your browser storage isn\'t working properly. Game progress won\'t be saved!');
-        } else {
-          console.log('localStorage test passed');
-        }
-      } catch (e) {
-        console.error('localStorage test error:', e);
-        alert('Your browser blocked storage access. Game progress won\'t be saved!');
-      }
-      
       initializeGame();
       generateNewsEvent();
       
-      // Set up auto-save - every second
-      window.saveInterval = setInterval(saveGameState, 1000);
-      
-      // Force immediate save
-      setTimeout(saveGameState, 100);
+      // Set up auto-save
+      setInterval(saveGameState, 300000); // Every 5 minutes
     });
 
     // Save before unloading
-    window.addEventListener('beforeunload', () => {
-      console.log('Page unloading, saving game state');
-      saveGameState();
-    });
+    window.addEventListener('beforeunload', saveGameState);
 
     // Initialize game variables
     let upgrades = { betterOdds: false, storageExpand: false };
@@ -1804,9 +1673,6 @@
       document.querySelectorAll('.pack-button, .pack-select').forEach(btn => {
         btn.disabled = false;
       });
-      
-      // Save game state after opening pack
-      saveGameState();
     }
 
     // --- 100+ Sneaker Database ---
@@ -2190,9 +2056,6 @@
           Object.keys(odds).forEach(k => odds[k] /= total);
         }
       }
-      
-      // Save game state after purchase
-      saveGameState();
     }
 
     // Patch rollSneaker to use getRandomSneaker and allow all brands
@@ -2246,9 +2109,6 @@
       updateCoins();
       updateInventory();
       showPurchaseNotification(`Sold ${sneaker.brand} ${sneaker.model} for ${formatCurrency(value)} coins!`);
-      
-      // Save game state after selling
-      saveGameState();
     }
 
     function claimDaily() {
@@ -2259,7 +2119,6 @@
         localStorage.setItem('dailyReward', now);
         updateCoins();
         showNotification("Daily reward claimed!");
-        saveGameState(); // Save after claiming daily reward
       } else {
         showNotification("Already claimed today!");
       }
@@ -2756,9 +2615,6 @@
       // Close trade modal
       closeTradeUI();
       appendTradeChatMessage('ai', 'Deal! Pleasure trading with you.');
-      
-      // Save after trading
-      saveGameState();
     }
 
     // Load purchase history from localStorage
@@ -3279,9 +3135,6 @@
             `Upgrade Agent (${formatCurrency(nextCost)} coins)` : 
             'Max Level Reached!';
         }
-        
-        // Save after upgrading
-        saveGameState();
       } else if (resellAgent.level >= resellAgent.maxLevel) {
         showPurchaseNotification('Already at maximum level!', 'error');
       } else {
@@ -3548,9 +3401,6 @@
       showPurchaseNotification(`Hired ${staff.name}!`);
       openHireStaff(); // Refresh the modal
       updateStaffDisplay();
-      
-      // Save after hiring staff
-      saveGameState();
     }
 
     function upgradeStaff(staffId) {
@@ -3579,9 +3429,6 @@
       showPurchaseNotification(`Upgraded ${staff.name} to level ${staff.level}!`);
       openHireStaff(); // Refresh the modal
       updateStaffDisplay();
-      
-      // Save after upgrading staff
-      saveGameState();
     }
 
     function applyStaffBonuses() {
@@ -3615,16 +3462,16 @@
       const now = Date.now();
       if (!autoBuyer.lastTradeTime || now - autoBuyer.lastTradeTime >= 60000) {
         const tradesPerMinute = autoBuyer.level + 1;
-        for (let i = 0; i < tradesPerMinute; i++) {
-          // Try to buy a pack if we have enough coins
-          if (coins >= packTypes.standard.cost) {
-            const packKeys = Object.keys(packTypes);
-            const randomPack = packKeys[Math.floor(Math.random() * packKeys.length)];
-            const pack = packTypes[randomPack];
-            if (coins >= pack.cost) {
-              coins -= pack.cost;
-              const sneaker = rollSneaker(randomPack);
-              inventory.push(sneaker);
+      for (let i = 0; i < tradesPerMinute; i++) {
+        // Try to buy a pack if we have enough coins
+        if (coins >= packTypes.standard.cost) {
+          const packKeys = Object.keys(packTypes);
+          const randomPack = packKeys[Math.floor(Math.random() * packKeys.length)];
+          const pack = packTypes[randomPack];
+          if (coins >= pack.cost) {
+            coins -= pack.cost;
+            const sneaker = rollSneaker(randomPack);
+            inventory.push(sneaker);
             }
           }
         }
@@ -3639,13 +3486,10 @@
             inventory.splice(sneakerIdx, 1);
           }
         }
-        updateCoins();
-        updateInventory();
+      updateCoins();
+      updateInventory();
         autoBuyer.lastTradeTime = now;
-          
-        // Save after auto buyer actions
-        saveGameState();
-      }
+    }
     }
     setInterval(autoBuyerTick, 1000);
 
@@ -3711,8 +3555,6 @@
         coins++;
         updateCoins();
         showPurchaseNotification("+1 coin!");
-        // Save after earning coins
-        saveGameState();
       }
     }
 
@@ -3954,9 +3796,6 @@
       // Reset cleaning game state
       currentCleaningSneaker = null;
       dirtSpots = [];
-      
-      // Save after cleaning
-      saveGameState();
     }
 
     // Fix for limited time offers
@@ -4232,74 +4071,19 @@
     // --- CONSOLIDATED INITIALIZATION ---
     function mainInit() {
       console.log('[mainInit] Starting initialization');
-      
-      // Fix for localStorage in some browsers
-      try {
-        if (typeof Storage !== "undefined") {
-          // Create a dedicated test function
-          const testStorage = function() {
-            try {
-              localStorage.setItem("test", "test");
-              localStorage.removeItem("test");
-              return true;
-            } catch (e) {
-              return false;
-            }
-          };
-          
-          if (!testStorage()) {
-            // Try to enable storage in Safari private mode
-            // This uses sessionStorage as a fallback
-            Storage.prototype._setItem = Storage.prototype.setItem;
-            Storage.prototype.setItem = function() {
-              try {
-                this._setItem.apply(this, arguments);
-              } catch (e) {
-                console.warn('localStorage setItem failed, using sessionStorage fallback');
-                sessionStorage.setItem.apply(sessionStorage, arguments);
-              }
-            };
-            
-            Storage.prototype._getItem = Storage.prototype.getItem;
-            Storage.prototype.getItem = function() {
-              try {
-                return this._getItem.apply(this, arguments);
-              } catch (e) {
-                console.warn('localStorage getItem failed, using sessionStorage fallback');
-                return sessionStorage.getItem.apply(sessionStorage, arguments);
-              }
-            };
-            
-            console.log('Storage polyfill applied');
-          }
-        }
-      } catch (e) {
-        console.error('Storage polyfill error:', e);
-      }
-      
       initializeGame(); // Loads state or sets default
-      generateNewsEvent();
-      
+      loadSettings();
+      loadPurchaseHistory();
+      updateCoins();
+      updateInventory();
+      updateResellAgentDisplay();
+      updateLimitedOffers();
+      updateStorageDisplay();
+      if (typeof updateStaffDisplay === 'function') updateStaffDisplay();
       // Add unique IDs to existing inventory
       inventory.forEach(s => { if (!s.id) s.id = Date.now() + Math.random(); });
-      
-      // Set up more aggressive auto-save (every second)
-      if (window.saveInterval) {
-        clearInterval(window.saveInterval);
-      }
-      window.saveInterval = setInterval(() => {
-        if (window.gameInitialized) {
-          saveGameState();
-        }
-      }, 1000);
-      
-      // Set up additional save on any UI interactions
-      document.addEventListener('click', function(e) {
-        if (window.gameInitialized && e.target.tagName === 'BUTTON') {
-          setTimeout(saveGameState, 100);
-        }
-      });
-      
+      // Set up auto-save
+      setInterval(saveGameState, 300000); // Every 5 minutes
       // Set up intervals
       setInterval(updateLimitedOffers, 1000);
       setInterval(generateNewsEvent, 60000);
@@ -4309,16 +4093,9 @@
           clickCount += autoClickerRate;
           coins += autoClickerRate;
           updateCoins();
-          if (document.querySelector('.click-count')) {
-            document.querySelector('.click-count').textContent = `Clicks: ${clickCount}`;
-          }
-          // Always save when auto-clicker runs
-          if (window.gameInitialized) {
-            saveGameState();
-          }
+          document.querySelector('.click-count').textContent = `Clicks: ${clickCount}`;
         }
       }, 1000);
-      
       // Modal overlay click handler
       const overlay = document.getElementById('modal-overlay');
       if (overlay) {
@@ -4326,7 +4103,6 @@
           if (e.target === this) closeAllModals();
         });
       }
-      
       // Sort pack select dropdown by ascending price
       const packSelect = document.getElementById('pack-type');
       if (packSelect) {
@@ -4345,56 +4121,71 @@
           packSelect.value = currentValue;
         }
       }
-      
-      // Listen for storage events from other tabs
-      window.addEventListener('storage', function(e) {
-        if (e.key === 'sneakerHustleGameState' && window.gameInitialized) {
-          console.log('Game state updated in another tab, reloading');
-          initializeGame();
-        }
-      });
-      
-      // Add a debug button to test storage
-      const debugBtn = document.createElement('button');
-      debugBtn.innerText = '🔄 Debug Storage';
-      debugBtn.style.position = 'fixed';
-      debugBtn.style.bottom = '10px';
-      debugBtn.style.right = '10px';
-      debugBtn.style.zIndex = '9999';
-      debugBtn.style.padding = '5px 10px';
-      debugBtn.style.background = '#ff5722';
-      debugBtn.style.color = 'white';
-      debugBtn.style.border = 'none';
-      debugBtn.style.borderRadius = '5px';
-      debugBtn.style.cursor = 'pointer';
-      debugBtn.onclick = function() {
-        const currentState = localStorage.getItem('sneakerHustleGameState');
-        console.log('Current storage state:', currentState ? 'Found (' + Math.round(currentState.length/1024) + ' KB)' : 'Not found');
-        
-        console.log('Current coins:', coins);
-        const forceSave = saveGameState();
-        console.log('Force save result:', forceSave);
-        
-        const afterState = localStorage.getItem('sneakerHustleGameState');
-        console.log('After storage state:', afterState ? 'Found (' + Math.round(afterState.length/1024) + ' KB)' : 'Not found');
-        
-        // Simulate refresh
-        if (confirm('Test refresh simulation?')) {
-          initializeGame();
-          console.log('After reload coins:', coins);
-        }
-      };
-      document.body.appendChild(debugBtn);
-      
       // Start news event generation immediately
       generateNewsEvent();
       setTimeout(generateNewsEvent, 5000);
-      
-      // Force an immediate save after initialization
-      setTimeout(() => {
-        window.gameInitialized = true;
-        saveGameState();
-      }, 500);
+    }
+
+    // Add debug logging to saveGameState and initializeGame
+    function saveGameState() {
+      const gameState = {
+        coins,
+        inventory,
+        purchaseHistory,
+        settings,
+        currentMarketBuyer,
+        limitedOffers: Array.from(limitedOffers.entries()),
+        activeMultipliers: {
+          global: window.globalMultiplier || 1,
+          brand: window.brandMultipliers || {},
+          coin: window.coinMultiplier || 1
+        },
+        currentTrader: window.currentTrader,
+        lastTraderResponse: window.lastTraderResponse,
+        hiredStaff,
+        resellAgentLevel: resellAgent.level,
+        storageUpgrades,
+        storageCost
+      };
+      localStorage.setItem('sneakerHustleGameState', JSON.stringify(gameState));
+      console.log('[saveGameState] Game state saved:', gameState);
+    }
+
+    function initializeGame() {
+      const savedState = localStorage.getItem('sneakerHustleGameState');
+      console.log('[initializeGame] Loaded state from localStorage:', savedState);
+      if (savedState) {
+        try {
+          const gameState = JSON.parse(savedState);
+          coins = gameState.coins ?? 10000;
+          inventory = gameState.inventory || [];
+          purchaseHistory = gameState.purchaseHistory || [];
+          if (gameState.settings) settings = { ...settings, ...gameState.settings };
+          if (gameState.currentMarketBuyer) currentMarketBuyer = gameState.currentMarketBuyer;
+          if (gameState.limitedOffers) limitedOffers = new Map(gameState.limitedOffers);
+          if (gameState.activeMultipliers) {
+            window.globalMultiplier = gameState.activeMultipliers.global;
+            window.brandMultipliers = gameState.activeMultipliers.brand;
+            window.coinMultiplier = gameState.activeMultipliers.coin;
+          }
+          if (gameState.currentTrader) {
+            window.currentTrader = gameState.currentTrader;
+            window.lastTraderResponse = gameState.lastTraderResponse;
+          }
+          if (gameState.hiredStaff) hiredStaff = gameState.hiredStaff;
+          if (gameState.resellAgentLevel !== undefined) resellAgent.level = gameState.resellAgentLevel;
+          if (gameState.storageUpgrades !== undefined) storageUpgrades = gameState.storageUpgrades;
+          if (gameState.storageCost !== undefined) storageCost = gameState.storageCost;
+        } catch (error) {
+          console.error('[initializeGame] Error loading game state:', error);
+          setDefaultState();
+        }
+      } else {
+        setDefaultState();
+      }
+      updateAllDisplays();
+      updateStorageDisplay();
+      if (typeof updateStaffDisplay === 'function') updateStaffDisplay();
     }
 
     // Remove all other window.addEventListener('load', ...) blocks and replace with:
