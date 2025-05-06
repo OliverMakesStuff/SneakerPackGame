@@ -1094,183 +1094,6 @@
     .trade-chat-msg.player-msg { background: #2980b9; color: #fff; text-align: right; }
     /* Trade chat: hacker font */
     .trade-chat, .trade-chat-msg { font-family: 'Fira Mono', 'Consolas', 'monospace'; letter-spacing: 0.5px; }
-
-    /* Prestige system styles */
-    .prestige-button {
-      background: linear-gradient(45deg, #f39c12, #e74c3c);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 20px;
-      font-size: 18px;
-      margin: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    
-    .prestige-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 8px rgba(0,0,0,0.3);
-    }
-    
-    .prestige-button:disabled {
-      background: linear-gradient(45deg, #95a5a6, #7f8c8d);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    .prestige-info {
-      background: #34495e;
-      padding: 15px;
-      border-radius: 8px;
-      margin: 15px 0;
-      text-align: center;
-    }
-    
-    .prestige-level {
-      font-size: 24px;
-      color: #f39c12;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-    
-    .prestige-bonus {
-      font-size: 16px;
-      color: #3498db;
-      margin: 5px 0;
-    }
-    
-    .prestige-progress {
-      background: #2c3e50;
-      height: 20px;
-      border-radius: 10px;
-      margin: 15px 0;
-      overflow: hidden;
-    }
-    
-    .prestige-progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #e74c3c, #f39c12);
-      width: 0%;
-      transition: width 0.5s;
-    }
-    
-    .prestige-modal {
-      text-align: center;
-    }
-    
-    .prestige-benefits {
-      background: #2c3e50;
-      padding: 15px;
-      border-radius: 8px;
-      margin: 15px 0;
-      text-align: left;
-    }
-    
-    .prestige-modal h3 {
-      color: #f39c12;
-      margin: 10px 0;
-    }
-    
-    .prestige-confirm-btn {
-      background: #e74c3c;
-      padding: 10px 20px;
-      font-size: 18px;
-      margin-top: 20px;
-    }
-    
-    .prestige-stars {
-      font-size: 28px;
-      color: #f39c12;
-      letter-spacing: 5px;
-      margin: 10px 0;
-    }
-
-    .prestige-milestone {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 8px;
-      margin: 5px 0;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .prestige-milestone.achieved {
-      background: rgba(46, 204, 113, 0.2);
-    }
-    
-    .prestige-milestone.next {
-      background: rgba(52, 152, 219, 0.2);
-      border: 1px dashed #3498db;
-    }
-    
-    .milestone-level {
-      font-weight: bold;
-      min-width: 30px;
-      text-align: center;
-    }
-    
-    .milestone-emoji {
-      font-size: 20px;
-      min-width: 30px;
-      text-align: center;
-    }
-    
-    .prestige-milestone-summary {
-      margin-top: 10px;
-      padding: 10px;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 5px;
-    }
-
-    /* Save code system styles */
-    .save-code-container {
-      margin: 15px 0;
-      text-align: center;
-    }
-    
-    .save-code-textarea {
-      width: 90%;
-      height: 80px;
-      background: #2c3e50;
-      border: 1px solid #34495e;
-      border-radius: 5px;
-      color: #ecf0f1;
-      padding: 10px;
-      margin: 10px 0;
-      font-family: monospace;
-      resize: none;
-    }
-    
-    .save-code-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 10px 0;
-    }
-    
-    .save-code-btn {
-      background: #2980b9;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 8px 15px;
-      cursor: pointer;
-    }
-    
-    .save-code-btn:hover {
-      background: #3498db;
-    }
-    
-    .save-code-info {
-      font-size: 0.9em;
-      color: #95a5a6;
-      margin: 5px 0;
-    }
   </style>
 </head>
 <body>
@@ -1289,14 +1112,6 @@
       Click!
       <div class="click-count">Clicks: 0</div>
     </button>
-    <div class="prestige-info">
-      <div class="prestige-level">Prestige Level: <span id="prestige-level">0</span></div>
-      <div class="prestige-bonus" id="prestige-bonuses"></div>
-      <div class="prestige-progress">
-        <div class="prestige-progress-fill" id="prestige-progress-fill"></div>
-      </div>
-      <button class="prestige-button" id="prestige-button" onclick="openPrestigeModal()">PRESTIGE</button>
-    </div>
     <div>
       <select id="pack-type" class="pack-select">
         <option value="standard">Standard Pack (100 Coins)</option>
@@ -1465,16 +1280,6 @@
         <label><input type="checkbox" id="skip-animation-toggle" onclick="toggleSkipAnimation()"> Skip Pack Animation</label>
       </div>
     </div>
-    
-    <div class="save-code-container">
-      <h3>Import/Export Save</h3>
-      <div class="save-code-info">Copy this code to backup or transfer your progress</div>
-      <textarea id="save-code-text" class="save-code-textarea" placeholder="Paste save code here..."></textarea>
-      <div class="save-code-buttons">
-        <button class="save-code-btn" onclick="exportSaveCode()">Export Save</button>
-        <button class="save-code-btn" onclick="importSaveCode()">Import Save</button>
-      </div>
-    </div>
   </div>
   <div class="modal" id="history-modal">
     <div class="modal-header">
@@ -1497,53 +1302,11 @@
   <div class="test-buttons">
     <button class="test-button" onclick="showBreakingNews(true)">Test Breaking News</button>
   </div>
-  <div class="modal" id="prestige-modal">
-    <div class="modal-header">
-      <h2>Prestige System</h2>
-      <button class="close-btn" onclick="closePrestigeModal()">Close</button>
-    </div>
-    <div class="prestige-modal">
-      <div class="prestige-stars" id="prestige-stars">★</div>
-      <p>You've reached <span id="prestige-coins-display">100,000</span> coins!</p>
-      <p>Are you ready to prestige and reset your progress for permanent bonuses?</p>
-      
-      <div class="prestige-benefits">
-        <h3>Benefits of Prestige Level <span id="next-prestige-level">1</span>:</h3>
-        <ul id="prestige-benefits-list">
-          <li>Reduced base pack costs (90 coins)</li>
-          <li>Increased click value (1 coin per click)</li>
-          <li>Keep your prestige bonuses forever</li>
-        </ul>
-      </div>
-      
-      <h3>Prestige Milestones:</h3>
-      <div id="prestige-milestones">
-        <!-- Milestone list will be added here -->
-      </div>
-      
-      <p><strong>Warning:</strong> You will lose all your coins, inventory items, and staff!</p>
-      
-      <button class="pack-button prestige-confirm-btn" onclick="confirmPrestige()">PRESTIGE NOW</button>
-    </div>
-  </div>
   <script>
     // Initialize game state
     let coins = 0;
     let inventory = [];
     let purchaseHistory = [];
-    let prestigeLevel = 0;
-    let clickValue = 1; // 1 coin per click at base (modified by prestige)
-    let clicksNeeded = 2; // Number of clicks needed for 1 coin (modified by prestige)
-    let clickCounter = 0; // Counter for current clicks
-    let inventoryCapacityBonus = 0; // Additional inventory slots from prestige
-    let rarityMultiplier = 1; // Multiplier for rarity chances
-    let extraSneakerChance = 0; // Chance for extra sneaker in packs
-    let passiveIncomeRate = 0; // Passive income per second
-    let passiveIncomeInterval = null; // Interval for passive income
-    let autoSellCommon = false; // Auto-sell common items
-    let freePackChance = 0; // Chance for free packs
-    let legendaryBoost = 0; // Boost to legendary chances
-    let doubleSaleChance = 0; // Chance for double sale value
     let settings = {
       soundEnabled: true,
       musicEnabled: true,
@@ -1573,12 +1336,6 @@
           coins = gameState.coins ?? 10000;
           inventory = gameState.inventory || [];
           purchaseHistory = gameState.purchaseHistory || [];
-          
-          // Restore prestige level
-          prestigeLevel = gameState.prestigeLevel || 0;
-          
-          // Apply prestige bonuses
-          applyPrestigeBonuses();
           
           // Restore settings
           if (gameState.settings) {
@@ -1638,8 +1395,6 @@
       coins = 1000;
       inventory = [];
       purchaseHistory = [];
-      prestigeLevel = 0;
-      clickValue = 0.5; // Default click value
       settings = {
         soundEnabled: true,
         musicEnabled: true,
@@ -1671,7 +1426,6 @@
       updateResellAgentDisplay();
       updateLimitedOffers();
       updateMarketBuyerDisplay();
-      updatePrestigeDisplay();
       applySettings();
     }
 
@@ -1694,8 +1448,7 @@
         hiredStaff,
         resellAgentLevel: resellAgent.level,
         storageUpgrades,
-        storageCost,
-        prestigeLevel
+        storageCost
       };
       
       localStorage.setItem('sneakerHustleGameState', JSON.stringify(gameState));
@@ -2197,38 +1950,6 @@
       localStorage.setItem('gameSettings', JSON.stringify(settings));
     }
 
-    function applySettings() {
-      // Apply settings to UI and game state
-      document.body.classList.toggle('light-mode', !!settings.lightMode);
-      document.body.classList.toggle('no-animations', settings.animationEnabled === false);
-
-      // Update toggles if they exist
-      if (document.getElementById('animation-toggle')) {
-        document.getElementById('animation-toggle').checked = !!settings.animationEnabled;
-      }
-      if (document.getElementById('notification-toggle')) {
-        document.getElementById('notification-toggle').checked = !!settings.notificationsEnabled;
-      }
-      if (document.getElementById('light-mode-toggle')) {
-        document.getElementById('light-mode-toggle').checked = !!settings.lightMode;
-      }
-      if (document.getElementById('skip-animation-toggle')) {
-        document.getElementById('skip-animation-toggle').checked = !!settings.skipPackAnimation;
-      }
-      if (document.getElementById('display-mode')) {
-        document.getElementById('display-mode').value = settings.displayMode;
-      }
-      if (document.getElementById('currency-display')) {
-        document.getElementById('currency-display').value = settings.currencyDisplay;
-      }
-      if (document.getElementById('sort-inventory')) {
-        document.getElementById('sort-inventory').value = settings.defaultSort;
-      }
-      // Update inventory and coins display
-      updateInventory();
-      updateCoins();
-    }
-
     function toggleAutoSell() {
       settings.autoSell = document.getElementById('auto-sell-toggle').checked;
       saveSettings();
@@ -2285,37 +2006,16 @@
     function openPack() {
       const type = document.getElementById("pack-type").value;
       let pack = {...packTypes[type]};
-      
-      // --- Always apply staff bonuses before opening pack ---
-      applyStaffBonuses();
-      
-      // Check for free pack chance from prestige
-      let isFree = false;
-      if (freePackChance > 0 && Math.random() < freePackChance) {
-        isFree = true;
-        showPurchaseNotification("🎁 Free pack from prestige bonus!", "success");
-      }
-      
-      // Apply prestige effect on pack cost if applicable
-      if (prestigeLevel > 0) {
-        pack.cost = Math.max(90, Math.floor(pack.cost * Math.pow(0.9, prestigeLevel)));
-      }
-      
       // Apply buyer staff discount
       if (type !== 'legendary' && packPriceMultiplier < 1) {
         pack.cost = Math.floor(pack.cost * packPriceMultiplier);
       }
-      
-      if (!isFree && coins < pack.cost) {
+      if (coins < pack.cost) {
         showPurchaseNotification("Not enough coins!", "error");
         return;
       }
-      
-      // Only deduct coins if not a free pack
-      if (!isFree) {
-        coins -= pack.cost;
-        updateCoins();
-      }
+      coins -= pack.cost;
+      updateCoins();
 
       // Disable buttons during pack opening
       document.querySelectorAll('.pack-button, .pack-select').forEach(btn => {
@@ -2330,21 +2030,13 @@
 
       // Generate sneakers
       currentSneakers = [];
-      
-      // Determine how many sneakers - check for extra sneaker chance
-      let sneakerCount = 3;
-      if (extraSneakerChance > 0 && Math.random() < extraSneakerChance) {
-        sneakerCount = 4;
-        showPurchaseNotification("🎁 Extra sneaker from prestige bonus!", "success");
-      }
-      
-      for (let i = 0; i < sneakerCount; i++) {
+      for (let i = 0; i < 3; i++) {
         let sneaker = rollSneaker(type);
         currentSneakers.push(sneaker);
       }
 
       // Record the purchase
-      addPurchaseToHistory('Pack Opening', isFree ? 0 : pack.cost, currentSneakers);
+      addPurchaseToHistory('Pack Opening', pack.cost, currentSneakers);
       
       // Reset state and start reveal
       currentSneakerIndex = 0;
@@ -2368,43 +2060,11 @@
 
     // Patch rollSneaker to use getRandomSneaker and allow all brands
     function rollSneaker(type) {
-      // --- Always apply staff bonuses before rolling sneaker ---
-      applyStaffBonuses();
       const pack = packTypes[type];
       let roll = Math.random();
-      
-      // Apply prestige rarity multiplier
-      if (rarityMultiplier > 1) {
-        // Shift the roll toward better rarities
-        roll = Math.pow(roll, 1 / rarityMultiplier);
-      }
-      
-      // Apply legendary boost if applicable
-      let odds = {...pack.odds};
-      if (legendaryBoost > 0 && odds.legendary) {
-        // Increase legendary odds
-        odds.legendary += legendaryBoost;
-        
-        // Normalize odds
-        const total = Object.values(odds).reduce((a, b) => a + b, 0);
-        if (total > 1) {
-          Object.keys(odds).forEach(k => odds[k] /= total);
-        }
-      }
-      
       if (upgrades.betterOdds) roll += 0.05;
-      // --- Apply authenticator staff bonus to odds ---
-      if (rarityBonus > 0) {
-        if (odds.rare) odds.rare += rarityBonus;
-        if (odds.epic) odds.epic += rarityBonus;
-        if (odds.legendary) odds.legendary += rarityBonus;
-        // Normalize odds if they exceed 1
-        let total = Object.values(odds).reduce((a, b) => a + b, 0);
-        if (total > 1) {
-          Object.keys(odds).forEach(k => odds[k] /= total);
-        }
-      }
       let rarity = "common";
+      let odds = pack.odds;
       let sum = 0;
       for (let key of ["common", "rare", "epic", "legendary"]) {
         if (odds[key]) {
@@ -2444,24 +2104,11 @@
       const bonus = 1 + (resellAgent.level * resellAgent.bonusPerLevel);
       value = Math.floor(value * bonus);
       
-      // Apply double sale chance from prestige
-      let isDoubleSale = false;
-      if (doubleSaleChance > 0 && Math.random() < doubleSaleChance) {
-        value *= 2;
-        isDoubleSale = true;
-      }
-      
       coins += value;
       inventory.splice(index, 1); // Remove the sneaker from inventory
       updateCoins();
       updateInventory();
-      
-      // Show different notification based on if it was a double sale
-      if (isDoubleSale) {
-        showPurchaseNotification(`💰 DOUBLE SALE! Sold ${sneaker.brand} ${sneaker.model} for ${formatCurrency(value)} coins!`);
-      } else {
-        showPurchaseNotification(`Sold ${sneaker.brand} ${sneaker.model} for ${formatCurrency(value)} coins!`);
-      }
+      showPurchaseNotification(`Sold ${sneaker.brand} ${sneaker.model} for ${formatCurrency(value)} coins!`);
     }
 
     function claimDaily() {
@@ -2819,39 +2466,22 @@
           s.dynamicValue : s.baseValue);
       }, 0);
 
-      // Calculate preference score for the offered sneakers
-      let preferenceBonus = 0;
-      yourSneakers.forEach(sneaker => {
-        // Brand preference check
-        if (currentTrader.preferences.some(pref => 
-          sneaker.brand.includes(pref) || 
-          sneaker.model.includes(pref)
-        )) {
-          preferenceBonus += 0.15; // 15% bonus per preferred brand/model
-        }
-        
-        // Rarity preference check
-        if (currentTrader.preferences.some(pref => 
-          sneaker.rarity.toLowerCase() === pref.toLowerCase()
-        )) {
-          preferenceBonus += 0.2; // 20% bonus for preferred rarity
-        }
-        
-        // Style match check
-        if ((currentTrader.style === 'hype' && (sneaker.rarity === 'legendary' || sneaker.rarity === 'epic')) ||
-            (currentTrader.style === 'budget' && (sneaker.rarity === 'common' || sneaker.rarity === 'rare')) ||
-            (currentTrader.style === 'luxury' && sneaker.rarity === 'legendary') ||
-            (currentTrader.style === 'classic' && (sneaker.brand === 'Nike' || sneaker.brand === 'Jordan' || sneaker.brand === 'Converse'))) {
-          preferenceBonus += 0.1; // 10% bonus for style match
-        }
-      });
-
       // Calculate target value based on trader preferences
       let targetTotalValue = yourTotalValue * adjustment;
       
-      // Apply preference bonus
-      targetTotalValue *= (1 + preferenceBonus);
+      // Adjust value based on how many preferred items are being offered
+      const preferredCount = yourSneakers.filter(s => 
+        currentTrader.preferences.some(pref => 
+          s.brand.includes(pref) || 
+          s.rarity.toLowerCase() === pref.toLowerCase()
+        )
+      ).length;
       
+      // Bonus for preferred items
+      if (preferredCount > 0) {
+        targetTotalValue *= (1 + (preferredCount * 0.15)); // 15% bonus per preferred item
+      }
+
       // Apply trader value preference
       switch(currentTrader.valuePreference) {
         case 'low':
@@ -2867,53 +2497,14 @@
           targetTotalValue *= 1.5;
           break;
       }
-      
-      // Check for specific negotiation messages in the chat
-      const chatMsgs = document.querySelectorAll('.trade-chat-msg.player-msg');
-      let chatBonus = 0;
-      
-      chatMsgs.forEach(msgElement => {
-        const msgText = msgElement.textContent.toLowerCase();
-        
-        // Negotiations that improve the offer
-        if (msgText.includes('rare') || msgText.includes('legendary') || msgText.includes('limited')) {
-          if (currentTrader.style === 'hype' || currentTrader.style === 'luxury') {
-            chatBonus += 0.05;
-          }
-        }
-        
-        if (msgText.includes('classic') || msgText.includes('vintage') || msgText.includes('retro')) {
-          if (currentTrader.style === 'classic') {
-            chatBonus += 0.07;
-          }
-        }
-        
-        if (msgText.includes('deal') || msgText.includes('fair')) {
-          chatBonus += 0.03;
-        }
-        
-        // Negotiations that may reduce the offer
-        if (msgText.includes('cheap') || msgText.includes('low')) {
-          if (currentTrader.style === 'luxury') {
-            chatBonus -= 0.1;
-          } else if (currentTrader.style === 'budget') {
-            chatBonus += 0.05;
-          }
-        }
-      });
-      
-      // Apply chat negotiation bonus
-      targetTotalValue *= (1 + chatBonus);
 
       // Generate AI offer
       aiTradeOffer = [];
       
-      // Create a pool of preferred sneakers that match trader's style and preferences
+      // Get preferred sneakers that match trader's style and preferences
       const preferredSneakers = sneakersDatabase.filter(s => {
-        // Check brand & model preferences
         const matchesPreference = currentTrader.preferences.some(pref => 
           s.brand.includes(pref) || 
-          s.model.includes(pref) ||
           s.rarity.toLowerCase() === pref.toLowerCase()
         );
         
@@ -2922,66 +2513,34 @@
           (currentTrader.style === 'hype' && (s.rarity === 'legendary' || s.rarity === 'epic')) ||
           (currentTrader.style === 'budget' && (s.rarity === 'common' || s.rarity === 'rare')) ||
           (currentTrader.style === 'luxury' && s.rarity === 'legendary') ||
-          (currentTrader.style === 'classic' && (s.brand === 'Nike' || s.brand === 'Jordan' || s.brand === 'Converse'))
+          (currentTrader.style === 'classic' && s.brand === 'Nike' || s.brand === 'Jordan')
         );
         
         return matchesPreference || matchesStyle;
       });
-      
-      // Sort the preferred sneakers by how well they match the trader's preferences
-      preferredSneakers.sort((a, b) => {
-        const scoreA = getPreferenceScore(a);
-        const scoreB = getPreferenceScore(b);
-        return scoreB - scoreA;  // Higher score first
-      });
 
-      // Try to offer preferred sneakers first (heavily favoring preferences)
+      // Try to offer preferred sneakers first
       while (aiTradeOffer.length < 3 && preferredSneakers.length > 0 && targetTotalValue > 0) {
-        // Take sneakers from the front of the sorted array (highest preference)
-        const sneaker = preferredSneakers.shift();
+        const index = Math.floor(Math.random() * preferredSneakers.length);
+        const sneaker = preferredSneakers[index];
         
-        if (sneaker.baseValue <= targetTotalValue * 1.5) { // Allow slightly higher values for preferred items
+        if (sneaker.baseValue <= targetTotalValue) {
           aiTradeOffer.push({...sneaker, id: Date.now() + Math.random()});
           targetTotalValue -= sneaker.baseValue;
+          preferredSneakers.splice(index, 1);
+        } else {
+          break;
         }
       }
 
-      // Fill remaining slots with affordable sneakers that somewhat match preferences
-      if (aiTradeOffer.length < 3 && targetTotalValue > 0) {
-        const remainingSneakers = sneakersDatabase.filter(s => 
-          !aiTradeOffer.some(offered => 
-            offered.brand === s.brand && offered.model === s.model && offered.rarity === s.rarity
-          ) && s.baseValue <= targetTotalValue
-        );
+      // Fill remaining slots with any affordable sneakers
+      while (aiTradeOffer.length < 3 && targetTotalValue > 0) {
+        const affordable = sneakersDatabase.filter(s => s.baseValue <= targetTotalValue);
+        if (affordable.length === 0) break;
         
-        // Sort by preference but to a lesser degree
-        remainingSneakers.sort((a, b) => {
-          const scoreA = getPreferenceScore(a) / 2; // Lower weight on preference
-          const scoreB = getPreferenceScore(b) / 2;
-          return scoreB - scoreA;
-        });
-        
-        // Add remaining sneakers
-        for (let i = 0; i < remainingSneakers.length && aiTradeOffer.length < 3 && targetTotalValue > 0; i++) {
-          const sneaker = remainingSneakers[i];
-          if (sneaker.baseValue <= targetTotalValue) {
-            aiTradeOffer.push({...sneaker, id: Date.now() + Math.random()});
-            targetTotalValue -= sneaker.baseValue;
-          }
-        }
-      }
-      
-      // If we still don't have 3 items, add some lower value items
-      if (aiTradeOffer.length < 3) {
-        const budgetSneakers = sneakersDatabase.filter(s => 
-          !aiTradeOffer.some(offered => 
-            offered.brand === s.brand && offered.model === s.model && offered.rarity === s.rarity
-          ) && s.rarity === 'common'
-        ).sort(() => Math.random() - 0.5);
-        
-        for (let i = 0; i < budgetSneakers.length && aiTradeOffer.length < 3; i++) {
-          aiTradeOffer.push({...budgetSneakers[i], id: Date.now() + Math.random()});
-        }
+        const sneaker = affordable[Math.floor(Math.random() * affordable.length)];
+        aiTradeOffer.push({...sneaker, id: Date.now() + Math.random()});
+        targetTotalValue -= sneaker.baseValue;
       }
 
       updateTradeComparison();
@@ -2999,34 +2558,23 @@
     }
 
     function getPreferenceScore(sneaker) {
-      if (!currentTrader) return 0;
-      
       let score = 0;
       
-      // Brand & model preference
-      currentTrader.preferences.forEach(pref => {
-        if (sneaker.brand.includes(pref) || sneaker.model.includes(pref)) {
-          score += 3;
-        }
-      });
+      // Brand preference
+      if (currentTrader.preferences.some(pref => sneaker.brand.includes(pref))) {
+        score += 3;
+      }
       
       // Rarity preference
-      currentTrader.preferences.forEach(pref => {
-        if (sneaker.rarity.toLowerCase() === pref.toLowerCase()) {
-          score += 2;
-        }
-      });
+      if (currentTrader.additionalPreferences.rarities.includes(sneaker.rarity)) {
+        score += 2;
+      }
       
-      // Style match
-      if (currentTrader.style === 'hype' && (sneaker.rarity === 'legendary' || sneaker.rarity === 'epic')) {
-        score += 3;
-      } else if (currentTrader.style === 'budget' && (sneaker.rarity === 'common' || sneaker.rarity === 'rare')) {
-        score += 3;
-      } else if (currentTrader.style === 'luxury' && sneaker.rarity === 'legendary') {
-        score += 4;
-      } else if (currentTrader.style === 'classic' && 
-                (sneaker.brand === 'Nike' || sneaker.brand === 'Jordan' || sneaker.brand === 'Converse')) {
-        score += 3;
+      // Value preference
+      const value = sneaker.baseValue;
+      if (value >= currentTrader.additionalPreferences.minValue && 
+          value <= currentTrader.additionalPreferences.maxValue) {
+        score += 2;
       }
       
       return score;
@@ -3322,10 +2870,6 @@
       }
     }
 
-    function updateMarketBuyerDisplay() {
-      // Dummy function: Market Buyer UI not implemented yet
-    }
-
     // Negotiation messages based on trader personality
     const negotiationOptions = {
       standard: [
@@ -3372,79 +2916,52 @@
 
       let responseText;
       let willing = false;
-      let adjustment = 1.0;
 
-      // Check message keywords
-      const msgLower = message.toLowerCase();
-      let preferenceMatched = false;
-      
-      // Check if message mentions any of the trader's preferences
-      currentTrader.preferences.forEach(pref => {
-        if (msgLower.includes(pref.toLowerCase())) {
-          preferenceMatched = true;
-        }
-      });
-      
       // Personality-based responses
-      if (preferenceMatched) {
-        // More likely to adjust if you mention their preferences
+      const responses = {
+        hype: [
+          "This trade isn't hype enough for me.",
+          "Now we're talking! Let me adjust my offer.",
+          "These are straight fire! Let's make this happen!"
+        ],
+        classic: [
+          "I prefer the timeless classics. Let me reconsider.",
+          "These have potential. Here's my counter-offer.",
+          "A classic trade! I can work with this."
+        ],
+        luxury: [
+          "I only deal in premium items. Let me see what else you have.",
+          "Getting closer to what I'm looking for.",
+          "Now this is the luxury I expect!"
+        ],
+        budget: [
+          "A bit out of my price range. Got anything cheaper?",
+          "This could work with some adjustments.",
+          "Perfect for my budget collection!"
+        ]
+      };
+
+      if (valueRatio > 0.9) {
         willing = Math.random() < 0.8;
-        adjustment = 1.05; // Better offer when you mention their preferences
-        
-        if (currentTrader.style === 'hype') {
-          responseText = "You know what I like! Let me see what I can offer.";
-        } else if (currentTrader.style === 'luxury') {
-          responseText = "I see you understand quality. I might have something special for you.";
-        } else if (currentTrader.style === 'classic') {
-          responseText = "A fellow enthusiast! I'll reconsider my offer.";
-        } else {
-          responseText = "That's exactly what I'm looking for! Let me adjust my offer.";
-        }
-      } else if (msgLower.includes("deal") || msgLower.includes("fair")) {
-        // Checking for deal-closing terms
-        if (valueRatio > 0.9) {
-          willing = true;
-          responseText = "You're right, this is a fair deal. Let's do it!";
-        } else {
-          willing = false;
-          responseText = "I don't think we're quite there yet. The values don't match up.";
-        }
-      } else if (msgLower.includes("add") || msgLower.includes("more") || msgLower.includes("better")) {
-        // Asking for more
+        responseText = willing ? responses[currentTrader.style][2] : "I think this is already a fair offer.";
+      } else if (valueRatio > 0.7) {
         willing = Math.random() < 0.6;
-        adjustment = 1.1; // Offer more
-        responseText = willing ? 
-          "I can sweeten the deal a bit. Check this out." : 
-          "I'm already offering the best I can right now.";
+        responseText = willing ? responses[currentTrader.style][1] : "The value gap is a bit too wide for me.";
       } else {
-        // Standard value-based response
-        if (valueRatio > 0.9) {
-          willing = Math.random() < 0.8;
-          adjustment = 1.0;
-          responseText = willing ? 
-            "I think we're close to a deal." : 
-            "I think this is already a fair offer.";
-        } else if (valueRatio > 0.7) {
-          willing = Math.random() < 0.6;
-          adjustment = 0.95;
-          responseText = willing ? 
-            "Let me adjust my offer a bit." : 
-            "The value gap is a bit too wide for me.";
-        } else {
-          willing = Math.random() < 0.3;
-          adjustment = 0.9;
-          responseText = "I'm not sure about this trade value.";
-        }
+        willing = Math.random() < 0.3;
+        responseText = responses[currentTrader.style][0];
       }
 
       response.innerHTML = `${currentTrader.emoji} ${currentTrader.name}: "${responseText}"`;
 
       if (willing) {
+        const adjustment = valueRatio > 0.8 ? 0.95 : 0.9;
         generateAITradeOffer(adjustment);
       }
 
+      updateNegotiationOptions();
       appendTradeChatMessage('player', message);
-      appendTradeChatMessage('ai', responseText);
+      appendTradeChatMessage('ai', getAIResponse(message));
     }
 
     function updateNegotiationOptions() {
@@ -3880,13 +3397,10 @@
       });
       updateCoins();
       
-      // --- Always apply staff bonuses after hiring ---
       applyStaffBonuses();
       showPurchaseNotification(`Hired ${staff.name}!`);
       openHireStaff(); // Refresh the modal
       updateStaffDisplay();
-      // --- Update pack select dropdown costs visually ---
-      updatePackSelectCosts();
     }
 
     function upgradeStaff(staffId) {
@@ -3911,13 +3425,10 @@
       staff.level++;
       updateCoins();
       
-      // --- Always apply staff bonuses after upgrade ---
       applyStaffBonuses();
       showPurchaseNotification(`Upgraded ${staff.name} to level ${staff.level}!`);
       openHireStaff(); // Refresh the modal
       updateStaffDisplay();
-      // --- Update pack select dropdown costs visually ---
-      updatePackSelectCosts();
     }
 
     function applyStaffBonuses() {
@@ -3926,7 +3437,6 @@
       sellPriceMultiplier = 1;
       autoClickerRate = 0;
       
-      // --- Apply staff bonuses based on current hired staff ---
       hiredStaff.forEach(staff => {
         const bonus = staff.baseBonus + (staff.level - 1) * staff.bonusPerLevel;
         switch(staff.id) {
@@ -3944,13 +3454,6 @@
             break;
         }
       });
-      // --- Update UI after staff bonus changes ---
-      updateCoins();
-      updateInventory();
-      updateResellAgentDisplay();
-      if (typeof updateStaffDisplay === 'function') updateStaffDisplay();
-      // --- Update pack select dropdown costs visually ---
-      updatePackSelectCosts();
     }
 
     function autoBuyerTick() {
@@ -3959,26 +3462,17 @@
       const now = Date.now();
       if (!autoBuyer.lastTradeTime || now - autoBuyer.lastTradeTime >= 60000) {
         const tradesPerMinute = autoBuyer.level + 1;
-        for (let i = 0; i < tradesPerMinute; i++) {
-          // Try to buy a pack if we have enough coins
-          // --- Use same cost calculation as player (with all discounts) ---
-          // Pick a random pack
+      for (let i = 0; i < tradesPerMinute; i++) {
+        // Try to buy a pack if we have enough coins
+        if (coins >= packTypes.standard.cost) {
           const packKeys = Object.keys(packTypes);
           const randomPack = packKeys[Math.floor(Math.random() * packKeys.length)];
-          let pack = { ...packTypes[randomPack] };
-          // Apply prestige effect on pack cost if applicable
-          if (prestigeLevel > 0) {
-            pack.cost = Math.max(90, Math.floor(pack.cost * Math.pow(0.9, prestigeLevel)));
-          }
-          // Apply buyer staff discount
-          if (randomPack !== 'legendary' && typeof packPriceMultiplier === 'number' && packPriceMultiplier < 1) {
-            pack.cost = Math.floor(pack.cost * packPriceMultiplier);
-          }
+          const pack = packTypes[randomPack];
           if (coins >= pack.cost) {
             coins -= pack.cost;
-            // --- Use rollSneaker to get correct odds (with Authenticator etc) ---
             const sneaker = rollSneaker(randomPack);
             inventory.push(sneaker);
+            }
           }
         }
         // After buying, try to trade to a random AI trader for coins (simulate a trade)
@@ -3992,10 +3486,10 @@
             inventory.splice(sneakerIdx, 1);
           }
         }
-        updateCoins();
-        updateInventory();
+      updateCoins();
+      updateInventory();
         autoBuyer.lastTradeTime = now;
-      }
+    }
     }
     setInterval(autoBuyerTick, 1000);
 
@@ -4057,23 +3551,11 @@
     function handleClick() {
       clickCount++;
       document.querySelector('.click-count').textContent = `Clicks: ${clickCount}`;
-      
-      // For pre-prestige, we need 2 clicks per coin
-      clickCounter++;
-      
-      // Apply prestige bonus to click value if applicable
-      if (clickCounter >= clicksNeeded) {
-        coins += 1;
-        clickCounter = 0; // Reset counter
+      if (clickCount % 2 === 0) {
+        coins++;
         updateCoins();
-        
-        if (clickCount % 10 === 0) {
-          showPurchaseNotification(`+1 coin!`);
-        }
+        showPurchaseNotification("+1 coin!");
       }
-      
-      // Update prestige progress
-      updatePrestigeDisplay();
     }
 
     // Used Market functionality
@@ -4406,52 +3888,35 @@
     }
 
     function getAIResponse(playerMsg) {
-      if (!currentTrader) return "Hello there!";
-      
       const msg = playerMsg.toLowerCase();
-      let response = "";
-      
-      // Check for preference matches in the message
-      let mentionedPreference = false;
-      currentTrader.preferences.forEach(pref => {
-        if (msg.includes(pref.toLowerCase())) {
-          mentionedPreference = true;
-        }
-      });
-      
-      if (mentionedPreference) {
+      if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey')) {
         return [
-          `You really know what I'm looking for! I love ${currentTrader.preferences[0]}.`,
-          `Ah, a fellow ${currentTrader.preferences[0]} enthusiast! Let's talk.`,
-          `You're speaking my language with that ${currentTrader.preferences[0]} mention!`
+          "Hey there! Ready to make a deal?",
+          "Hello! What are you looking to trade today?",
+          "Hi! Let's see what you've got."
         ][Math.floor(Math.random()*3)];
       }
-      
-      // Style-specific responses to common message types
-      if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey')) {
-        if (currentTrader.style === 'hype') {
-          return "What's up! Ready to see some fire kicks?";
-        } else if (currentTrader.style === 'luxury') {
-          return "Greetings. I trust you've brought items of quality?";
-        } else if (currentTrader.style === 'classic') {
-          return "Hello there! Always good to meet another sneaker enthusiast.";
-        } else { // budget
-          return "Hey! Got any good deals for me today?";
-        }
-      }
-      
       if (msg.includes('value') || msg.includes('worth')) {
-        if (currentTrader.style === 'hype') {
-          return "Value? It's all about the hype, friend!";
-        } else if (currentTrader.style === 'luxury') {
-          return "I only deal in premium items. Quality has its price.";
-        } else if (currentTrader.style === 'classic') {
-          return "True value is in the history and quality of a classic piece.";
-        } else { // budget
-          return "I'm looking for the best bang for my buck, you know?";
-        }
+        return [
+          "I'm always looking for value. That one is pretty nice!",
+          "Value is subjective, but I know a good deal when I see one.",
+          "Depends on the market, but that's a solid sneaker."
+        ][Math.floor(Math.random()*3)];
       }
-      
+      if (msg.includes('add') || msg.includes('more')) {
+        return [
+          "Maybe if you add something extra, I'll consider it.",
+          "Sweeten the deal and we might have a trade.",
+          "What else can you offer?"
+        ][Math.floor(Math.random()*3)];
+      }
+      if (msg.includes('rare') || msg.includes('legendary')) {
+        return [
+          "Rare kicks always catch my eye!",
+          "Legendary? Now you're talking!",
+          "Those are hard to come by."
+        ][Math.floor(Math.random()*3)];
+      }
       if (msg.includes('deal') || msg.includes('accept')) {
         return [
           "Deal! Pleasure doing business.",
@@ -4459,38 +3924,43 @@
           "You've got yourself a deal!"
         ][Math.floor(Math.random()*3)];
       }
-      
-      // Default responses based on trader style
-      if (currentTrader.style === 'hype') {
+      if (msg.includes('bye') || msg.includes('later')) {
+        return [
+          "See you next time!",
+          "Catch you later!",
+          "Goodbye!"
+        ][Math.floor(Math.random()*3)];
+      }
+      // Default fallback: personality-based
+      if (currentTrader && currentTrader.style === 'hype') {
         return [
           "That's fire! But is it enough?",
           "I'm all about the hype, show me something exclusive.",
           "Not bad, but I want the latest drops."
         ][Math.floor(Math.random()*3)];
       }
-      if (currentTrader.style === 'classic') {
+      if (currentTrader && currentTrader.style === 'classic') {
         return [
           "Classic taste! But let's see if it's worth it.",
           "I respect the classics, but I need more.",
           "Old school, but is it gold?"
         ][Math.floor(Math.random()*3)];
       }
-      if (currentTrader.style === 'luxury') {
+      if (currentTrader && currentTrader.style === 'luxury') {
         return [
           "Luxury is my game. Impress me!",
           "Only the finest for me.",
           "Is that premium enough?"
         ][Math.floor(Math.random()*3)];
       }
-      if (currentTrader.style === 'budget') {
+      if (currentTrader && currentTrader.style === 'budget') {
         return [
           "I'm on a budget, but I like a good deal.",
           "Can you make it cheaper?",
           "Looking for bargains!"
         ][Math.floor(Math.random()*3)];
       }
-      
-      // Fallback generic response
+      // Otherwise, generic
       return [
         "Interesting offer!",
         "Let me think about that...",
@@ -4609,7 +4079,6 @@
       updateResellAgentDisplay();
       updateLimitedOffers();
       updateStorageDisplay();
-      updatePrestigeDisplay();
       if (typeof updateStaffDisplay === 'function') updateStaffDisplay();
       // Add unique IDs to existing inventory
       inventory.forEach(s => { if (!s.id) s.id = Date.now() + Math.random(); });
@@ -4627,30 +4096,6 @@
           document.querySelector('.click-count').textContent = `Clicks: ${clickCount}`;
         }
       }, 1000);
-      // Check for auto-sell common from prestige
-      setInterval(() => {
-        if (autoSellCommon && inventory.length > 0) {
-          const commonItems = inventory.filter(item => item.rarity === 'common');
-          let totalValue = 0;
-          commonItems.forEach(item => {
-            const idx = inventory.indexOf(item);
-            if (idx !== -1) {
-              totalValue += item.baseValue;
-              inventory.splice(idx, 1);
-            }
-          });
-          if (commonItems.length > 0) {
-            coins += totalValue;
-            updateCoins();
-            updateInventory();
-            showPurchaseNotification(`Auto-sold ${commonItems.length} common items for ${formatCurrency(totalValue)} coins!`);
-          }
-        }
-      }, 30000); // Check every 30 seconds
-      // Apply prestige bonuses and start passive income if needed
-      applyPrestigeBonuses();
-      // --- Ensure staff bonuses are always applied on load ---
-      applyStaffBonuses();
       // Modal overlay click handler
       const overlay = document.getElementById('modal-overlay');
       if (overlay) {
@@ -4679,8 +4124,6 @@
       // Start news event generation immediately
       generateNewsEvent();
       setTimeout(generateNewsEvent, 5000);
-      // --- Update pack select dropdown costs visually on load ---
-      updatePackSelectCosts();
     }
 
     // Add debug logging to saveGameState and initializeGame
@@ -4702,8 +4145,7 @@
         hiredStaff,
         resellAgentLevel: resellAgent.level,
         storageUpgrades,
-        storageCost,
-        prestigeLevel
+        storageCost
       };
       localStorage.setItem('sneakerHustleGameState', JSON.stringify(gameState));
       console.log('[saveGameState] Game state saved:', gameState);
@@ -4734,7 +4176,6 @@
           if (gameState.resellAgentLevel !== undefined) resellAgent.level = gameState.resellAgentLevel;
           if (gameState.storageUpgrades !== undefined) storageUpgrades = gameState.storageUpgrades;
           if (gameState.storageCost !== undefined) storageCost = gameState.storageCost;
-          if (gameState.prestigeLevel !== undefined) prestigeLevel = gameState.prestigeLevel;
         } catch (error) {
           console.error('[initializeGame] Error loading game state:', error);
           setDefaultState();
@@ -4749,859 +4190,6 @@
 
     // Remove all other window.addEventListener('load', ...) blocks and replace with:
     window.addEventListener('load', mainInit);
-
-    // --- Prestige System Functions ---
-    function applyPrestigeBonuses() {
-      // Base bonuses (from prestige level 1)
-      // Set click value based on prestige level (1 click = 1 coin from level 1)
-      if (prestigeLevel > 0) {
-        clicksNeeded = 1; // 1 click = 1 coin
-      } else {
-        clicksNeeded = 2; // 2 clicks = 1 coin (default)
-      }
-      
-      // Additional bonuses based on prestige level milestones
-      
-      // Inventory capacity bonus (more slots per prestige)
-      inventoryCapacityBonus = prestigeLevel * 5; // +5 slots per prestige level
-      
-      // Rarity chance bonus (increases with prestige)
-      rarityMultiplier = 1 + (prestigeLevel * 0.05); // +5% better odds per prestige
-      
-      // Special unlocks at specific prestige levels
-      if (prestigeLevel >= 3) {
-        // Prestige 3+: Chance for extra sneaker in packs
-        extraSneakerChance = 0.15 + ((prestigeLevel - 3) * 0.05); // 15% + 5% per level above 3
-        extraSneakerChance = Math.min(extraSneakerChance, 0.75); // Cap at 75%
-      } else {
-        extraSneakerChance = 0;
-      }
-      
-      // Prestige 5+: Passive income
-      if (prestigeLevel >= 5) {
-        passiveIncomeRate = 1 + ((prestigeLevel - 5) * 1); // 1 coin/sec + 1 per level above 5
-      } else {
-        passiveIncomeRate = 0;
-      }
-      
-      // Prestige 7+: Auto-sell common items
-      autoSellCommon = prestigeLevel >= 7;
-      
-      // Prestige 10+: Chance for free packs
-      if (prestigeLevel >= 10) {
-        freePackChance = 0.05 + ((prestigeLevel - 10) * 0.02); // 5% + 2% per level above 10
-        freePackChance = Math.min(freePackChance, 0.5); // Cap at 50%
-      } else {
-        freePackChance = 0;
-      }
-      
-      // Prestige 15+: Legendary boost
-      if (prestigeLevel >= 15) {
-        legendaryBoost = 0.05 + ((prestigeLevel - 15) * 0.01); // +5% legendary chance + 1% per level above 15
-        legendaryBoost = Math.min(legendaryBoost, 0.25); // Cap at 25% bonus
-      } else {
-        legendaryBoost = 0;
-      }
-      
-      // Prestige 20+: Double value on sales 
-      doubleSaleChance = prestigeLevel >= 20 ? 0.2 + ((prestigeLevel - 20) * 0.02) : 0;
-      doubleSaleChance = Math.min(doubleSaleChance, 0.5); // Cap at 50%
-      
-      // Initialize passive income ticker if needed
-      if (passiveIncomeRate > 0 && !passiveIncomeInterval) {
-        startPassiveIncome();
-      }
-    }
-    
-    function updatePrestigeDisplay() {
-      const levelDisplay = document.getElementById('prestige-level');
-      const bonusesDisplay = document.getElementById('prestige-bonuses');
-      const progressFill = document.getElementById('prestige-progress-fill');
-      const prestigeButton = document.getElementById('prestige-button');
-      
-      if (levelDisplay) levelDisplay.textContent = prestigeLevel;
-      
-      if (bonusesDisplay) {
-        let bonuses = [];
-        if (prestigeLevel > 0) bonuses.push("+1 coin per click");
-        if (prestigeLevel > 0) bonuses.push("Reduced pack costs");
-        if (inventoryCapacityBonus > 0) bonuses.push(`+${inventoryCapacityBonus} inventory slots`);
-        if (rarityMultiplier > 1) bonuses.push(`+${Math.round((rarityMultiplier-1)*100)}% rarity chance`);
-        if (extraSneakerChance > 0) bonuses.push(`${Math.round(extraSneakerChance*100)}% extra sneaker chance`);
-        if (passiveIncomeRate > 0) bonuses.push(`${passiveIncomeRate} coins/sec passive income`);
-        if (autoSellCommon) bonuses.push("Auto-sell common items");
-        if (freePackChance > 0) bonuses.push(`${Math.round(freePackChance*100)}% free pack chance`);
-        if (legendaryBoost > 0) bonuses.push(`+${Math.round(legendaryBoost*100)}% legendary chance`);
-        if (doubleSaleChance > 0) bonuses.push(`${Math.round(doubleSaleChance*100)}% double sale value chance`);
-        
-        bonusesDisplay.innerHTML = bonuses.length > 0 ? 
-          bonuses.join(' • ') : 
-          "Reach 100,000 coins to prestige";
-      }
-      
-      if (progressFill) {
-        const nextPrestigeThreshold = 100000 * Math.pow(2, prestigeLevel);
-        const progress = Math.min(100, (coins / nextPrestigeThreshold) * 100);
-        progressFill.style.width = `${progress}%`;
-      }
-      
-      if (prestigeButton) {
-        const nextPrestigeThreshold = 100000 * Math.pow(2, prestigeLevel);
-        prestigeButton.disabled = coins < nextPrestigeThreshold;
-        prestigeButton.textContent = `PRESTIGE (${formatCurrency(nextPrestigeThreshold)} coins)`;
-      }
-    }
-    
-    function openPrestigeModal() {
-      const nextPrestigeThreshold = 100000 * Math.pow(2, prestigeLevel);
-      if (coins < nextPrestigeThreshold) {
-        showPurchaseNotification(`You need ${formatCurrency(nextPrestigeThreshold)} coins to prestige!`, "error");
-        return;
-      }
-      
-      // Set up modal display
-      document.getElementById('prestige-coins-display').textContent = formatCurrency(nextPrestigeThreshold);
-      document.getElementById('next-prestige-level').textContent = prestigeLevel + 1;
-      document.getElementById('prestige-stars').textContent = '★'.repeat(prestigeLevel + 1);
-      
-      // Update benefits list for next prestige level
-      updatePrestigeBenefitsList(prestigeLevel + 1);
-      
-      // Update milestones display
-      updatePrestigeMilestones();
-      
-      // Show modal
-      document.getElementById('prestige-modal').classList.add('show');
-      document.getElementById('modal-overlay').classList.add('show');
-    }
-    
-    function updatePrestigeBenefitsList(nextLevel) {
-      const list = document.getElementById('prestige-benefits-list');
-      list.innerHTML = '';
-      
-      // Add base benefits
-      list.innerHTML += `<li>Reduced base pack costs (90 coins)</li>`;
-      list.innerHTML += `<li>Increased click value (1 coin per click)</li>`;
-      list.innerHTML += `<li>+${nextLevel * 5} inventory slots</li>`;
-      list.innerHTML += `<li>+${Math.round(nextLevel * 5)}% better rarity chances</li>`;
-      
-      // Add milestone benefits
-      if (nextLevel >= 3 && prestigeLevel < 3) {
-        list.innerHTML += `<li><strong>NEW!</strong> 15% chance for extra sneaker in packs</li>`;
-      } else if (nextLevel >= 3) {
-        const chance = Math.min(75, 15 + ((nextLevel - 3) * 5));
-        list.innerHTML += `<li>${chance}% chance for extra sneaker in packs</li>`;
-      }
-      
-      if (nextLevel >= 5 && prestigeLevel < 5) {
-        list.innerHTML += `<li><strong>NEW!</strong> 1 coin/sec passive income</li>`;
-      } else if (nextLevel >= 5) {
-        const rate = 1 + ((nextLevel - 5));
-        list.innerHTML += `<li>${rate} coins/sec passive income</li>`;
-      }
-      
-      if (nextLevel >= 7 && prestigeLevel < 7) {
-        list.innerHTML += `<li><strong>NEW!</strong> Auto-sell common items</li>`;
-      } else if (nextLevel >= 7) {
-        list.innerHTML += `<li>Auto-sell common items</li>`;
-      }
-      
-      if (nextLevel >= 10 && prestigeLevel < 10) {
-        list.innerHTML += `<li><strong>NEW!</strong> 5% chance for free packs</li>`;
-      } else if (nextLevel >= 10) {
-        const chance = Math.min(50, 5 + ((nextLevel - 10) * 2));
-        list.innerHTML += `<li>${chance}% chance for free packs</li>`;
-      }
-      
-      if (nextLevel >= 15 && prestigeLevel < 15) {
-        list.innerHTML += `<li><strong>NEW!</strong> +5% legendary chance</li>`;
-      } else if (nextLevel >= 15) {
-        const boost = Math.min(25, 5 + ((nextLevel - 15)));
-        list.innerHTML += `<li>+${boost}% legendary chance</li>`;
-      }
-      
-      if (nextLevel >= 20 && prestigeLevel < 20) {
-        list.innerHTML += `<li><strong>NEW!</strong> 20% chance for double sale value</li>`;
-      } else if (nextLevel >= 20) {
-        const chance = Math.min(50, 20 + ((nextLevel - 20) * 2));
-        list.innerHTML += `<li>${chance}% chance for double sale value</li>`;
-      }
-    }
-    
-    function updatePrestigeMilestones() {
-      const milestones = [
-        { level: 1, emoji: "🎯", desc: "Basic prestige bonuses" },
-        { level: 3, emoji: "🎁", desc: "Chance for extra sneaker in packs" },
-        { level: 5, emoji: "⏱️", desc: "Passive income" },
-        { level: 7, emoji: "♻️", desc: "Auto-sell common items" },
-        { level: 10, emoji: "🎫", desc: "Chance for free packs" },
-        { level: 15, emoji: "💎", desc: "Legendary chance boost" },
-        { level: 20, emoji: "💰", desc: "Double sale value chance" },
-        { level: 25, emoji: "🌟", desc: "Golden click boost" },
-        { level: 30, emoji: "🔮", desc: "Mystery feature unlock" },
-        { level: 50, emoji: "👑", desc: "Prestige Master status" }
-      ];
-      
-      const container = document.getElementById('prestige-milestones');
-      if (!container) return;
-      
-      container.innerHTML = '';
-      
-      const nextLevel = prestigeLevel + 1;
-      let nextMilestone = false;
-      
-      milestones.forEach(milestone => {
-        const isAchieved = prestigeLevel >= milestone.level;
-        const isNext = !isAchieved && nextLevel >= milestone.level;
-        
-        if (isAchieved || isNext || (!nextMilestone && milestone.level > nextLevel)) {
-          if (!nextMilestone && milestone.level > nextLevel) nextMilestone = true;
-          
-          container.innerHTML += `
-            <div class="prestige-milestone ${isAchieved ? 'achieved' : ''} ${isNext ? 'next' : ''}">
-              <div class="milestone-level">P${milestone.level}</div>
-              <div class="milestone-emoji">${milestone.emoji}</div>
-              <div class="milestone-desc">${milestone.desc}</div>
-            </div>
-          `;
-        }
-      });
-      
-      // Add summary of current progress
-      const achievedCount = milestones.filter(m => prestigeLevel >= m.level).length;
-      const totalMilestones = milestones.length;
-      
-      container.innerHTML += `
-        <div class="prestige-milestone-summary">
-          Milestones Achieved: ${achievedCount}/${totalMilestones}
-        </div>
-      `;
-    }
-    
-    function startPassiveIncome() {
-      if (passiveIncomeInterval) clearInterval(passiveIncomeInterval);
-      
-      passiveIncomeInterval = setInterval(() => {
-        if (passiveIncomeRate > 0) {
-          coins += passiveIncomeRate;
-          updateCoins();
-          updatePrestigeDisplay();
-        }
-      }, 1000);
-    }
-    
-    function confirmPrestige() {
-      const nextPrestigeThreshold = 100000 * Math.pow(2, prestigeLevel);
-      if (coins < nextPrestigeThreshold) {
-        showPurchaseNotification(`Not enough coins to prestige!`, "error");
-        closePrestigeModal();
-        return;
-      }
-      
-      // Increment prestige level
-      prestigeLevel++;
-      
-      // Reset game progress but keep prestige level
-      inventory = [];
-      coins = 1000; // Starting coins
-      hiredStaff = [];
-      resellAgent.level = 0;
-      storageUpgrades = 0;
-      storageCost = 300;
-      
-      // Apply prestige bonuses
-      applyPrestigeBonuses();
-      
-      // Update displays
-      updateAllDisplays();
-      saveGameState();
-      
-      // Close modal and show notification
-      closePrestigeModal();
-      showPurchaseNotification(`🌟 Prestiged to Level ${prestigeLevel}! 🌟`, "success");
-    }
-
-    // Save code system functions
-    function exportSaveCode() {
-      try {
-        // Create a save object with all game state
-        const saveObject = {
-          coins,
-          inventory,
-          purchaseHistory,
-          settings,
-          hiredStaff,
-          resellAgentLevel: resellAgent.level,
-          storageUpgrades,
-          storageCost,
-          prestigeLevel,
-          timestamp: Date.now(),
-          version: "1.0"
-        };
-        
-        // Convert to JSON and then encode with a simpler method
-        // We'll use URI encoding instead of btoa as it handles special characters better
-        const jsonString = JSON.stringify(saveObject);
-        const encodedSave = encodeURIComponent(jsonString);
-        
-        // Add a prefix to identify our game saves
-        const saveCode = `SPT-${encodedSave}`;
-        
-        // Display in text area
-        const textArea = document.getElementById('save-code-text');
-        textArea.value = saveCode;
-        textArea.select();
-        
-        console.log("Save code generated successfully");
-        
-        // Try to copy to clipboard
-        navigator.clipboard.writeText(saveCode).then(() => {
-          showPurchaseNotification("Save code copied to clipboard!", "success");
-        }).catch(err => {
-          console.error('Could not copy text: ', err);
-          showPurchaseNotification("Please copy the code manually", "info");
-        });
-      } catch (error) {
-        console.error("Error generating save code:", error);
-        showPurchaseNotification("Error generating save code", "error");
-      }
-    }
-    
-    function importSaveCode() {
-      try {
-        const textArea = document.getElementById('save-code-text');
-        let saveCode = textArea.value.trim();
-        
-        console.log("Attempting to import save code:", saveCode.substring(0, 20) + "...");
-        
-        // Check if it's a valid save code
-        if (!saveCode.startsWith('SPT-')) {
-          showPurchaseNotification("Invalid save code format - must start with SPT-", "error");
-          return;
-        }
-        
-        // Remove prefix
-        saveCode = saveCode.substring(4); // Remove "SPT-"
-        
-        try {
-          // Decode using URI decoding instead of atob
-          const jsonString = decodeURIComponent(saveCode);
-          console.log("Decoded JSON string length:", jsonString.length);
-          
-          // Try to parse the JSON
-          const saveObject = JSON.parse(jsonString);
-          console.log("Save object parsed successfully:", Object.keys(saveObject));
-          
-          // Version check
-          if (!saveObject.version) {
-            showPurchaseNotification("This save code is from an older version and cannot be imported", "error");
-            return;
-          }
-          
-          // Confirm import
-          if (!confirm("Are you sure you want to import this save? Your current progress will be overwritten.")) {
-            return;
-          }
-          
-          // Import state with validation
-          coins = typeof saveObject.coins === 'number' ? saveObject.coins : 0;
-          inventory = Array.isArray(saveObject.inventory) ? saveObject.inventory : [];
-          purchaseHistory = Array.isArray(saveObject.purchaseHistory) ? saveObject.purchaseHistory : [];
-          
-          // Safely merge settings
-          const savedSettings = saveObject.settings || {};
-          settings = { 
-            soundEnabled: savedSettings.soundEnabled ?? settings.soundEnabled,
-            musicEnabled: savedSettings.musicEnabled ?? settings.musicEnabled,
-            soundVolume: savedSettings.soundVolume ?? settings.soundVolume,
-            musicVolume: savedSettings.musicVolume ?? settings.musicVolume,
-            notifications: savedSettings.notifications ?? settings.notifications,
-            animations: savedSettings.animations ?? settings.animations,
-            autoSell: savedSettings.autoSell ?? settings.autoSell,
-            currencyDisplay: savedSettings.currencyDisplay ?? settings.currencyDisplay,
-            displayMode: savedSettings.displayMode ?? settings.displayMode,
-            defaultSort: savedSettings.defaultSort ?? settings.defaultSort,
-            rollAnimation: savedSettings.rollAnimation ?? settings.rollAnimation,
-            volume: savedSettings.volume ?? settings.volume,
-            lightMode: savedSettings.lightMode ?? settings.lightMode,
-            skipPackAnimation: savedSettings.skipPackAnimation ?? settings.skipPackAnimation
-          };
-          
-          hiredStaff = Array.isArray(saveObject.hiredStaff) ? saveObject.hiredStaff : [];
-          resellAgent.level = typeof saveObject.resellAgentLevel === 'number' ? saveObject.resellAgentLevel : 0;
-          storageUpgrades = typeof saveObject.storageUpgrades === 'number' ? saveObject.storageUpgrades : 0;
-          storageCost = typeof saveObject.storageCost === 'number' ? saveObject.storageCost : 300;
-          prestigeLevel = typeof saveObject.prestigeLevel === 'number' ? saveObject.prestigeLevel : 0;
-          
-          console.log("Import successful - applying settings and bonuses");
-          
-          // Apply settings and bonuses
-          applyPrestigeBonuses();
-          applySettings();
-          
-          // Update all displays
-          updateAllDisplays();
-          
-          // Save to local storage
-          saveGameState();
-          
-          showPurchaseNotification("Save imported successfully!", "success");
-          closeSettings();
-        } catch (decodeError) {
-          console.error("Error decoding or parsing save:", decodeError);
-          
-          // Try alternate decode method (for backward compatibility)
-          try {
-            console.log("Trying alternate decode method...");
-            const jsonString = atob(saveCode);
-            const saveObject = JSON.parse(jsonString);
-            
-            // Process the save as above...
-            // (Same import code as above)
-            coins = typeof saveObject.coins === 'number' ? saveObject.coins : 0;
-            inventory = Array.isArray(saveObject.inventory) ? saveObject.inventory : [];
-            purchaseHistory = Array.isArray(saveObject.purchaseHistory) ? saveObject.purchaseHistory : [];
-            
-            // Safely merge settings
-            const savedSettings = saveObject.settings || {};
-            settings = { 
-              soundEnabled: savedSettings.soundEnabled ?? settings.soundEnabled,
-              musicEnabled: savedSettings.musicEnabled ?? settings.musicEnabled,
-              soundVolume: savedSettings.soundVolume ?? settings.soundVolume,
-              musicVolume: savedSettings.musicVolume ?? settings.musicVolume,
-              notifications: savedSettings.notifications ?? settings.notifications,
-              animations: savedSettings.animations ?? settings.animations,
-              autoSell: savedSettings.autoSell ?? settings.autoSell,
-              currencyDisplay: savedSettings.currencyDisplay ?? settings.currencyDisplay,
-              displayMode: savedSettings.displayMode ?? settings.displayMode,
-              defaultSort: savedSettings.defaultSort ?? settings.defaultSort,
-              rollAnimation: savedSettings.rollAnimation ?? settings.rollAnimation,
-              volume: savedSettings.volume ?? settings.volume,
-              lightMode: savedSettings.lightMode ?? settings.lightMode,
-              skipPackAnimation: savedSettings.skipPackAnimation ?? settings.skipPackAnimation
-            };
-            
-            hiredStaff = Array.isArray(saveObject.hiredStaff) ? saveObject.hiredStaff : [];
-            resellAgent.level = typeof saveObject.resellAgentLevel === 'number' ? saveObject.resellAgentLevel : 0;
-            storageUpgrades = typeof saveObject.storageUpgrades === 'number' ? saveObject.storageUpgrades : 0;
-            storageCost = typeof saveObject.storageCost === 'number' ? saveObject.storageCost : 300;
-            prestigeLevel = typeof saveObject.prestigeLevel === 'number' ? saveObject.prestigeLevel : 0;
-            
-            // Apply settings and bonuses
-            applyPrestigeBonuses();
-            applySettings();
-            
-            // Update all displays
-            updateAllDisplays();
-            
-            // Save to local storage
-            saveGameState();
-            
-            showPurchaseNotification("Save imported successfully (using legacy format)!", "success");
-            closeSettings();
-          } catch (fallbackError) {
-            console.error("Fallback decode also failed:", fallbackError);
-            showPurchaseNotification("Error importing save code. Please check the format and try again.", "error");
-          }
-        }
-      } catch (error) {
-        console.error("Error importing save code:", error);
-        showPurchaseNotification("Import failed. Error details in browser console (F12).", "error");
-      }
-    }
-    
-    // Add a manual save/load debug utility function
-    function debugSaveLoad() {
-      console.log("Current game state:", {
-        coins,
-        inventory: inventory.length + " items",
-        prestigeLevel,
-        settings
-      });
-      
-      // Create a direct localStorage backup that doesn't rely on encoding
-      try {
-        const gameState = {
-          coins,
-          inventory,
-          purchaseHistory,
-          settings,
-          hiredStaff,
-          resellAgentLevel: resellAgent.level,
-          storageUpgrades,
-          storageCost,
-          prestigeLevel
-        };
-        
-        localStorage.setItem('sneakerHustleDebugBackup', JSON.stringify(gameState));
-        console.log("Debug backup created in localStorage");
-      } catch (e) {
-        console.error("Debug backup failed:", e);
-      }
-    }
-    
-    // Add emergency restore function
-    function emergencyRestore() {
-      try {
-        const backup = localStorage.getItem('sneakerHustleDebugBackup');
-        if (!backup) {
-          console.error("No debug backup found");
-          return false;
-        }
-        
-        const gameState = JSON.parse(backup);
-        coins = gameState.coins || 0;
-        inventory = gameState.inventory || [];
-        prestigeLevel = gameState.prestigeLevel || 0;
-        
-        // Apply settings and update
-        applyPrestigeBonuses();
-        updateAllDisplays();
-        console.log("Emergency restore completed");
-        return true;
-      } catch (e) {
-        console.error("Emergency restore failed:", e);
-        return false;
-      }
-    }
-    
-    // Function to close the prestige modal (re-adding this function that was removed)
-    function closePrestigeModal() {
-      document.getElementById('prestige-modal').classList.remove('show');
-      document.getElementById('modal-overlay').classList.remove('show');
-    }
-    
-    // Fix save code import/export with direct event listeners
-    document.addEventListener('DOMContentLoaded', function() {
-      // Ensure the buttons have event listeners directly attached
-      const exportBtn = document.getElementById('export-save-btn');
-      const importBtn = document.getElementById('import-save-btn');
-      
-      if (exportBtn) {
-        exportBtn.addEventListener('click', function() {
-          console.log("Export button clicked");
-          exportSaveCode();
-        });
-      }
-      
-      if (importBtn) {
-        importBtn.addEventListener('click', function() {
-          console.log("Import button clicked");
-          importSaveCode();
-        });
-      }
-      
-      // Ensure the buttons in the settings modal work properly
-      const settingsModal = document.getElementById('settings-modal');
-      if (settingsModal) {
-        const exportBtnInSettings = settingsModal.querySelector('.save-code-btn[onclick="exportSaveCode()"]');
-        const importBtnInSettings = settingsModal.querySelector('.save-code-btn[onclick="importSaveCode()"]');
-        
-        if (exportBtnInSettings) {
-          exportBtnInSettings.addEventListener('click', function(e) {
-            console.log("Export button in settings clicked");
-            e.preventDefault();
-            exportSaveCode();
-          });
-        }
-        
-        if (importBtnInSettings) {
-          importBtnInSettings.addEventListener('click', function(e) {
-            console.log("Import button in settings clicked");
-            e.preventDefault();
-            importSaveCode();
-          });
-        }
-      }
-    });
-    
-    // Simplified version of the export function with better error handling
-    function exportSaveCode() {
-      console.log("Export save function called");
-      try {
-        // Create a simpler save object to avoid potential circular references
-        const saveObject = {
-          coins: coins,
-          inventory: inventory.map(item => ({
-            id: item.id,
-            brand: item.brand,
-            model: item.model,
-            colorway: item.colorway,
-            rarity: item.rarity,
-            baseValue: item.baseValue,
-            dynamicValue: item.dynamicValue || item.baseValue
-          })),
-          prestigeLevel: prestigeLevel,
-          settings: settings,
-          hiredStaff: hiredStaff,
-          resellAgentLevel: resellAgent.level,
-          storageUpgrades: storageUpgrades,
-          storageCost: storageCost,
-          timestamp: Date.now(),
-          version: "1.0"
-        };
-        
-        // Convert to JSON with basic error handling
-        let jsonString;
-        try {
-          jsonString = JSON.stringify(saveObject);
-          console.log("Save data stringified successfully, length:", jsonString.length);
-        } catch (jsonError) {
-          console.error("JSON stringify error:", jsonError);
-          showPurchaseNotification("Error creating save data: " + jsonError.message, "error");
-          return;
-        }
-        
-        // Use LZString compression instead of just encoding
-        let compressedString;
-        try {
-          // If LZString is not defined, we'll just use encodeURIComponent
-          if (typeof LZString !== 'undefined') {
-            compressedString = 'LZST-' + LZString.compressToEncodedURIComponent(jsonString);
-            console.log("Save compressed with LZString");
-          } else {
-            compressedString = 'SPT-' + encodeURIComponent(jsonString);
-            console.log("Save encoded with encodeURIComponent (no compression)");
-          }
-        } catch (encodeError) {
-          console.error("Compression/encoding error:", encodeError);
-          showPurchaseNotification("Error encoding save data", "error");
-          return;
-        }
-        
-        // Set in textarea
-        const textArea = document.getElementById('save-code-text');
-        if (textArea) {
-          textArea.value = compressedString;
-          textArea.select();
-          console.log("Save code set in textarea");
-          
-          // Try copying to clipboard
-          try {
-            document.execCommand('copy') || navigator.clipboard.writeText(compressedString);
-            showPurchaseNotification("Save code copied to clipboard!", "success");
-          } catch (clipboardError) {
-            console.warn("Clipboard copy failed, manual copy required:", clipboardError);
-            showPurchaseNotification("Please copy the code manually", "info");
-          }
-        } else {
-          console.error("Textarea element not found");
-          showPurchaseNotification("Error: Could not find save code field", "error");
-        }
-      } catch (error) {
-        console.error("Export save error:", error);
-        showPurchaseNotification("Error generating save code: " + error.message, "error");
-      }
-    }
-    
-    // Simplified version of the import function with better error handling
-    function importSaveCode() {
-      console.log("Import save function called");
-      try {
-        const textArea = document.getElementById('save-code-text');
-        if (!textArea) {
-          console.error("Textarea element not found");
-          showPurchaseNotification("Error: Could not find save code field", "error");
-          return;
-        }
-        
-        let saveCode = textArea.value.trim();
-        if (!saveCode) {
-          showPurchaseNotification("Please enter a save code", "error");
-          return;
-        }
-        
-        console.log("Processing save code:", saveCode.substring(0, 20) + "...");
-        
-        let jsonString;
-        
-        // Check which format we're dealing with
-        if (saveCode.startsWith('LZST-')) {
-          // LZString compressed format
-          try {
-            if (typeof LZString !== 'undefined') {
-              jsonString = LZString.decompressFromEncodedURIComponent(saveCode.substring(5));
-              console.log("Decompressed LZString save code");
-            } else {
-              showPurchaseNotification("LZString decompression not available", "error");
-              return;
-            }
-          } catch (decompressError) {
-            console.error("LZString decompression error:", decompressError);
-            showPurchaseNotification("Error decompressing save code", "error");
-            return;
-          }
-        } else if (saveCode.startsWith('SPT-')) {
-          // Regular encoded format
-          try {
-            jsonString = decodeURIComponent(saveCode.substring(4));
-            console.log("Decoded URI-encoded save code");
-          } catch (decodeError) {
-            console.error("URI decode error:", decodeError);
-            
-            // Try base64 as fallback
-            try {
-              jsonString = atob(saveCode.substring(4));
-              console.log("Decoded base64 save code");
-            } catch (base64Error) {
-              console.error("Base64 decode error:", base64Error);
-              showPurchaseNotification("Error decoding save code", "error");
-              return;
-            }
-          }
-        } else {
-          showPurchaseNotification("Invalid save code format - must start with SPT- or LZST-", "error");
-          return;
-        }
-        
-        // Parse the JSON
-        let saveObject;
-        try {
-          saveObject = JSON.parse(jsonString);
-          console.log("Save parsed successfully, keys:", Object.keys(saveObject));
-        } catch (parseError) {
-          console.error("JSON parse error:", parseError);
-          showPurchaseNotification("Error parsing save data", "error");
-          return;
-        }
-        
-        // Confirm import
-        if (!confirm("Are you sure you want to import this save? Your current progress will be overwritten.")) {
-          return;
-        }
-        
-        // Import state with validation and safeguards
-        coins = typeof saveObject.coins === 'number' ? saveObject.coins : 0;
-        inventory = Array.isArray(saveObject.inventory) ? saveObject.inventory : [];
-        prestigeLevel = typeof saveObject.prestigeLevel === 'number' ? saveObject.prestigeLevel : 0;
-        
-        // Safely merge settings
-        if (saveObject.settings) {
-          Object.keys(settings).forEach(key => {
-            if (saveObject.settings[key] !== undefined) {
-              settings[key] = saveObject.settings[key];
-            }
-          });
-        }
-        
-        hiredStaff = Array.isArray(saveObject.hiredStaff) ? saveObject.hiredStaff : [];
-        resellAgent.level = typeof saveObject.resellAgentLevel === 'number' ? saveObject.resellAgentLevel : 0;
-        storageUpgrades = typeof saveObject.storageUpgrades === 'number' ? saveObject.storageUpgrades : 0;
-        storageCost = typeof saveObject.storageCost === 'number' ? saveObject.storageCost : 300;
-        
-        console.log("Import data validated, applying...");
-        
-        // Apply settings and bonuses
-        applyPrestigeBonuses();
-        applySettings();
-        
-        // Update all displays
-        updateAllDisplays();
-        
-        // Save to local storage
-        saveGameState();
-        
-        showPurchaseNotification("Save imported successfully!", "success");
-        closeSettings();
-        console.log("Import completed successfully");
-      } catch (error) {
-        console.error("Import save error:", error);
-        showPurchaseNotification("Error importing save: " + error.message, "error");
-      }
-    }
-
-    // Add this function to update the pack select dropdown with current costs
-    function updatePackSelectCosts() {
-      const packSelect = document.getElementById('pack-type');
-      if (!packSelect) return;
-      // Get packTypes and sort by cost (after discounts)
-      const packEntries = Object.entries(packTypes).map(([key, val]) => {
-        // Calculate discounted cost
-        let cost = val.cost;
-        // Apply prestige effect on pack cost if applicable
-        if (prestigeLevel > 0) {
-          cost = Math.max(90, Math.floor(cost * Math.pow(0.9, prestigeLevel)));
-        }
-        // Apply buyer staff discount
-        if (key !== 'legendary' && typeof packPriceMultiplier === 'number' && packPriceMultiplier < 1) {
-          cost = Math.floor(cost * packPriceMultiplier);
-        }
-        return { key, ...val, cost };
-      });
-      packEntries.sort((a, b) => a.cost - b.cost);
-      // Save current selection
-      const currentValue = packSelect.value;
-      // Clear and repopulate
-      packSelect.innerHTML = '';
-      packEntries.forEach(pack => {
-        const label = pack.key.charAt(0).toUpperCase() + pack.key.slice(1) + ' Pack';
-        const option = document.createElement('option');
-        option.value = pack.key;
-        option.textContent = `${label} (${pack.cost} Coins)`;
-        packSelect.appendChild(option);
-      });
-      // Restore selection if possible
-      if ([...packSelect.options].some(opt => opt.value === currentValue)) {
-        packSelect.value = currentValue;
-      }
-    }
-
-    // (Optional) Show improved odds next to pack dropdown
-    function updatePackOddsDisplay() {
-      const oddsDivId = 'pack-odds-display';
-      let oddsDiv = document.getElementById(oddsDivId);
-      if (!oddsDiv) {
-        // Insert after pack select
-        const packSelect = document.getElementById('pack-type');
-        if (packSelect && packSelect.parentNode) {
-          oddsDiv = document.createElement('div');
-          oddsDiv.id = oddsDivId;
-          oddsDiv.style.fontSize = '13px';
-          oddsDiv.style.marginTop = '4px';
-          packSelect.parentNode.insertBefore(oddsDiv, packSelect.nextSibling);
-        }
-      }
-      if (!oddsDiv) return;
-      // Get selected pack
-      const type = document.getElementById('pack-type')?.value;
-      if (!type || !packTypes[type]) {
-        oddsDiv.textContent = '';
-        return;
-      }
-      // Calculate odds with bonuses
-      let odds = { ...packTypes[type].odds };
-      if (rarityBonus > 0) {
-        if (odds.rare) odds.rare += rarityBonus;
-        if (odds.epic) odds.epic += rarityBonus;
-        if (odds.legendary) odds.legendary += rarityBonus;
-        // Normalize odds if they exceed 1
-        let total = Object.values(odds).reduce((a, b) => a + b, 0);
-        if (total > 1) {
-          Object.keys(odds).forEach(k => odds[k] /= total);
-        }
-      }
-      // Format odds for display
-      const display = [];
-      for (const key of ['common', 'rare', 'epic', 'legendary']) {
-        if (odds[key]) {
-          display.push(`<span class='rarity-${key}'>${key.charAt(0).toUpperCase() + key.slice(1)}: ${(odds[key]*100).toFixed(1)}%</span>`);
-        }
-      }
-      oddsDiv.innerHTML = 'Pack Odds: ' + display.join(' | ');
-    }
-    // Update odds display when pack select changes or staff bonuses change
-    if (typeof updatePackSelectCosts === 'function') {
-      const origUpdatePackSelectCosts = updatePackSelectCosts;
-      updatePackSelectCosts = function() {
-        origUpdatePackSelectCosts();
-        updatePackOddsDisplay();
-      }
-    }
-    // Also update odds display on pack select change
-    const packSelectEl = document.getElementById('pack-type');
-    if (packSelectEl) {
-      packSelectEl.addEventListener('change', updatePackOddsDisplay);
-    }
   </script>
 </body>
 </html>
