@@ -2197,6 +2197,38 @@
       localStorage.setItem('gameSettings', JSON.stringify(settings));
     }
 
+    function applySettings() {
+      // Apply settings to UI and game state
+      document.body.classList.toggle('light-mode', !!settings.lightMode);
+      document.body.classList.toggle('no-animations', settings.animationEnabled === false);
+
+      // Update toggles if they exist
+      if (document.getElementById('animation-toggle')) {
+        document.getElementById('animation-toggle').checked = !!settings.animationEnabled;
+      }
+      if (document.getElementById('notification-toggle')) {
+        document.getElementById('notification-toggle').checked = !!settings.notificationsEnabled;
+      }
+      if (document.getElementById('light-mode-toggle')) {
+        document.getElementById('light-mode-toggle').checked = !!settings.lightMode;
+      }
+      if (document.getElementById('skip-animation-toggle')) {
+        document.getElementById('skip-animation-toggle').checked = !!settings.skipPackAnimation;
+      }
+      if (document.getElementById('display-mode')) {
+        document.getElementById('display-mode').value = settings.displayMode;
+      }
+      if (document.getElementById('currency-display')) {
+        document.getElementById('currency-display').value = settings.currencyDisplay;
+      }
+      if (document.getElementById('sort-inventory')) {
+        document.getElementById('sort-inventory').value = settings.defaultSort;
+      }
+      // Update inventory and coins display
+      updateInventory();
+      updateCoins();
+    }
+
     function toggleAutoSell() {
       settings.autoSell = document.getElementById('auto-sell-toggle').checked;
       saveSettings();
