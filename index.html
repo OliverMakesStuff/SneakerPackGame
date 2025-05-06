@@ -1094,6 +1094,100 @@
     .trade-chat-msg.player-msg { background: #2980b9; color: #fff; text-align: right; }
     /* Trade chat: hacker font */
     .trade-chat, .trade-chat-msg { font-family: 'Fira Mono', 'Consolas', 'monospace'; letter-spacing: 0.5px; }
+
+    /* Prestige system styles */
+    .prestige-button {
+      background: linear-gradient(45deg, #f39c12, #e74c3c);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      font-size: 18px;
+      margin: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .prestige-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+    }
+    
+    .prestige-button:disabled {
+      background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .prestige-info {
+      background: #34495e;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      text-align: center;
+    }
+    
+    .prestige-level {
+      font-size: 24px;
+      color: #f39c12;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    
+    .prestige-bonus {
+      font-size: 16px;
+      color: #3498db;
+      margin: 5px 0;
+    }
+    
+    .prestige-progress {
+      background: #2c3e50;
+      height: 20px;
+      border-radius: 10px;
+      margin: 15px 0;
+      overflow: hidden;
+    }
+    
+    .prestige-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #e74c3c, #f39c12);
+      width: 0%;
+      transition: width 0.5s;
+    }
+    
+    .prestige-modal {
+      text-align: center;
+    }
+    
+    .prestige-benefits {
+      background: #2c3e50;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      text-align: left;
+    }
+    
+    .prestige-modal h3 {
+      color: #f39c12;
+      margin: 10px 0;
+    }
+    
+    .prestige-confirm-btn {
+      background: #e74c3c;
+      padding: 10px 20px;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+    
+    .prestige-stars {
+      font-size: 28px;
+      color: #f39c12;
+      letter-spacing: 5px;
+      margin: 10px 0;
+    }
   </style>
 </head>
 <body>
@@ -1112,6 +1206,14 @@
       Click!
       <div class="click-count">Clicks: 0</div>
     </button>
+    <div class="prestige-info">
+      <div class="prestige-level">Prestige Level: <span id="prestige-level">0</span></div>
+      <div class="prestige-bonus" id="prestige-bonuses"></div>
+      <div class="prestige-progress">
+        <div class="prestige-progress-fill" id="prestige-progress-fill"></div>
+      </div>
+      <button class="prestige-button" id="prestige-button" onclick="openPrestigeModal()">PRESTIGE</button>
+    </div>
     <div>
       <select id="pack-type" class="pack-select">
         <option value="standard">Standard Pack (100 Coins)</option>
@@ -1302,11 +1404,37 @@
   <div class="test-buttons">
     <button class="test-button" onclick="showBreakingNews(true)">Test Breaking News</button>
   </div>
+  <div class="modal" id="prestige-modal">
+    <div class="modal-header">
+      <h2>Prestige System</h2>
+      <button class="close-btn" onclick="closePrestigeModal()">Close</button>
+    </div>
+    <div class="prestige-modal">
+      <div class="prestige-stars" id="prestige-stars">★</div>
+      <p>You've reached <span id="prestige-coins-display">100,000</span> coins!</p>
+      <p>Are you ready to prestige and reset your progress for permanent bonuses?</p>
+      
+      <div class="prestige-benefits">
+        <h3>Benefits of Prestige Level <span id="next-prestige-level">1</span>:</h3>
+        <ul>
+          <li>Reduced base pack costs (90 coins)</li>
+          <li>Increased click value (1 coin per click)</li>
+          <li>Keep your prestige bonuses forever</li>
+        </ul>
+      </div>
+      
+      <p><strong>Warning:</strong> You will lose all your coins, inventory items, and staff!</p>
+      
+      <button class="pack-button prestige-confirm-btn" onclick="confirmPrestige()">PRESTIGE NOW</button>
+    </div>
+  </div>
   <script>
     // Initialize game state
     let coins = 0;
     let inventory = [];
     let purchaseHistory = [];
+    let prestigeLevel = 0;
+    let clickValue = 0.5; // Default 0.5 coins per click (2 clicks = 1 coin)
     let settings = {
       soundEnabled: true,
       musicEnabled: true,
@@ -1336,6 +1464,12 @@
           coins = gameState.coins ?? 10000;
           inventory = gameState.inventory || [];
           purchaseHistory = gameState.purchaseHistory || [];
+          
+          // Restore prestige level
+          prestigeLevel = gameState.prestigeLevel || 0;
+          
+          // Apply prestige bonuses
+          applyPrestigeBonuses();
           
           // Restore settings
           if (gameState.settings) {
@@ -1395,6 +1529,8 @@
       coins = 1000;
       inventory = [];
       purchaseHistory = [];
+      prestigeLevel = 0;
+      clickValue = 0.5; // Default click value
       settings = {
         soundEnabled: true,
         musicEnabled: true,
@@ -1426,6 +1562,7 @@
       updateResellAgentDisplay();
       updateLimitedOffers();
       updateMarketBuyerDisplay();
+      updatePrestigeDisplay();
       applySettings();
     }
 
@@ -1448,7 +1585,8 @@
         hiredStaff,
         resellAgentLevel: resellAgent.level,
         storageUpgrades,
-        storageCost
+        storageCost,
+        prestigeLevel
       };
       
       localStorage.setItem('sneakerHustleGameState', JSON.stringify(gameState));
@@ -2006,10 +2144,17 @@
     function openPack() {
       const type = document.getElementById("pack-type").value;
       let pack = {...packTypes[type]};
+      
+      // Apply prestige effect on pack cost if applicable
+      if (prestigeLevel > 0) {
+        pack.cost = Math.max(90, Math.floor(pack.cost * Math.pow(0.9, prestigeLevel)));
+      }
+      
       // Apply buyer staff discount
       if (type !== 'legendary' && packPriceMultiplier < 1) {
         pack.cost = Math.floor(pack.cost * packPriceMultiplier);
       }
+      
       if (coins < pack.cost) {
         showPurchaseNotification("Not enough coins!", "error");
         return;
@@ -3677,11 +3822,17 @@
     function handleClick() {
       clickCount++;
       document.querySelector('.click-count').textContent = `Clicks: ${clickCount}`;
-      if (clickCount % 2 === 0) {
-        coins++;
-        updateCoins();
-        showPurchaseNotification("+1 coin!");
+      
+      // Apply prestige bonus to click value if applicable
+      coins += clickValue;
+      updateCoins();
+      
+      if (clickCount % 10 === 0) {
+        showPurchaseNotification(`+${clickValue} coins!`);
       }
+      
+      // Update prestige progress
+      updatePrestigeDisplay();
     }
 
     // Used Market functionality
@@ -4283,7 +4434,8 @@
         hiredStaff,
         resellAgentLevel: resellAgent.level,
         storageUpgrades,
-        storageCost
+        storageCost,
+        prestigeLevel
       };
       localStorage.setItem('sneakerHustleGameState', JSON.stringify(gameState));
       console.log('[saveGameState] Game state saved:', gameState);
@@ -4314,6 +4466,7 @@
           if (gameState.resellAgentLevel !== undefined) resellAgent.level = gameState.resellAgentLevel;
           if (gameState.storageUpgrades !== undefined) storageUpgrades = gameState.storageUpgrades;
           if (gameState.storageCost !== undefined) storageCost = gameState.storageCost;
+          if (gameState.prestigeLevel !== undefined) prestigeLevel = gameState.prestigeLevel;
         } catch (error) {
           console.error('[initializeGame] Error loading game state:', error);
           setDefaultState();
@@ -4328,6 +4481,100 @@
 
     // Remove all other window.addEventListener('load', ...) blocks and replace with:
     window.addEventListener('load', mainInit);
+
+    // --- Prestige System Functions ---
+    function applyPrestigeBonuses() {
+      // Set click value based on prestige level (1 coin per click from level 1)
+      clickValue = prestigeLevel > 0 ? 1 : 0.5;
+      
+      // Pack costs are affected during openPack function
+      
+      // Could add additional bonuses here as the system expands
+    }
+    
+    function updatePrestigeDisplay() {
+      const levelDisplay = document.getElementById('prestige-level');
+      const bonusesDisplay = document.getElementById('prestige-bonuses');
+      const progressFill = document.getElementById('prestige-progress-fill');
+      const prestigeButton = document.getElementById('prestige-button');
+      
+      if (levelDisplay) levelDisplay.textContent = prestigeLevel;
+      
+      if (bonusesDisplay) {
+        let bonuses = [];
+        if (prestigeLevel > 0) bonuses.push("+1 coin per click");
+        if (prestigeLevel > 0) bonuses.push("Reduced pack costs");
+        
+        bonusesDisplay.innerHTML = bonuses.length > 0 ? 
+          bonuses.join(' • ') : 
+          "Reach 100,000 coins to prestige";
+      }
+      
+      if (progressFill) {
+        const nextPrestigeThreshold = 100000 * Math.pow(2, prestigeLevel);
+        const progress = Math.min(100, (coins / nextPrestigeThreshold) * 100);
+        progressFill.style.width = `${progress}%`;
+      }
+      
+      if (prestigeButton) {
+        const nextPrestigeThreshold = 100000 * Math.pow(2, prestigeLevel);
+        prestigeButton.disabled = coins < nextPrestigeThreshold;
+        prestigeButton.textContent = `PRESTIGE (${formatCurrency(nextPrestigeThreshold)} coins)`;
+      }
+    }
+    
+    function openPrestigeModal() {
+      const nextPrestigeThreshold = 100000 * Math.pow(2, prestigeLevel);
+      if (coins < nextPrestigeThreshold) {
+        showPurchaseNotification(`You need ${formatCurrency(nextPrestigeThreshold)} coins to prestige!`, "error");
+        return;
+      }
+      
+      // Set up modal display
+      document.getElementById('prestige-coins-display').textContent = formatCurrency(nextPrestigeThreshold);
+      document.getElementById('next-prestige-level').textContent = prestigeLevel + 1;
+      document.getElementById('prestige-stars').textContent = '★'.repeat(prestigeLevel + 1);
+      
+      // Show modal
+      document.getElementById('prestige-modal').classList.add('show');
+      document.getElementById('modal-overlay').classList.add('show');
+    }
+    
+    function closePrestigeModal() {
+      document.getElementById('prestige-modal').classList.remove('show');
+      document.getElementById('modal-overlay').classList.remove('show');
+    }
+    
+    function confirmPrestige() {
+      const nextPrestigeThreshold = 100000 * Math.pow(2, prestigeLevel);
+      if (coins < nextPrestigeThreshold) {
+        showPurchaseNotification(`Not enough coins to prestige!`, "error");
+        closePrestigeModal();
+        return;
+      }
+      
+      // Increment prestige level
+      prestigeLevel++;
+      
+      // Reset game progress but keep prestige level
+      inventory = [];
+      coins = 1000; // Starting coins
+      hiredStaff = [];
+      resellAgent.level = 0;
+      storageUpgrades = 0;
+      storageCost = 300;
+      
+      // Apply prestige bonuses
+      applyPrestigeBonuses();
+      
+      // Update displays
+      updateAllDisplays();
+      saveGameState();
+      
+      // Close modal and show notification
+      closePrestigeModal();
+      showPurchaseNotification(`🌟 Prestiged to Level ${prestigeLevel}! 🌟`, "success");
+    }
   </script>
 </body>
 </html>
