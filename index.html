@@ -1323,30 +1323,7 @@
       lightMode: false,
       skipPackAnimation: false
     };
-    let hiredStaff = [];
-    let resellAgent = {
-      level: 0, // Start at level 0
-      maxLevel: 5,
-      baseUpgradeCost: 500,
-      bonusPerLevel: 0.2
-    };
-    let storageUpgrades = 0;
-    let storageCost = 300;
-    let limitedOffers = new Map();
-    let sneakersDatabase = [];
-    let upgrades = { betterOdds: false, storageExpand: false };
-    let totalProfit = 0;
-    let currentSneakers = [];
-    let currentSneakerIndex = 0;
-    let currentOffer = null;
-    let offerInterval = null;
-    let selectedTradeItems = [];
-    let activeEvents = new Map();
-    let clickCount = 0;
-    let currentCleaningSneaker = null;
-    let dirtSpots = [];
-    let cleaningInProgress = false;
-    let currentTrader = null;
+
     // Initialize game state from save or defaults
     function initializeGame() {
       const savedState = localStorage.getItem('sneakerHustleGameState');
@@ -1448,6 +1425,7 @@
       updateInventory();
       updateResellAgentDisplay();
       updateLimitedOffers();
+      updateMarketBuyerDisplay();
       applySettings();
     }
 
@@ -1487,6 +1465,20 @@
 
     // Save before unloading
     window.addEventListener('beforeunload', saveGameState);
+
+    // Initialize game variables
+    let upgrades = { betterOdds: false, storageExpand: false };
+    let totalProfit = 0;
+    let currentSneakers = [];
+    let currentSneakerIndex = 0;
+    let currentOffer = null;
+    let offerInterval = null;
+    let selectedTradeItems = [];
+    let activeEvents = new Map();
+    let clickCount = 0;
+    let currentCleaningSneaker = null;
+    let dirtSpots = [];
+    let cleaningInProgress = false;
 
     // News Events Data
     const newsEvents = [
@@ -2180,6 +2172,8 @@
       "Loves exclusive releases",
       "Only trades for premium items"
     ];
+
+    let currentTrader = null;
 
     function revealNextSneaker() {
       const nextButton = document.getElementById("next-sneaker-btn");
@@ -3112,6 +3106,17 @@
       showBreakingNews(true);
     });
 
+    let resellAgent = {
+      level: 0, // Start at level 0
+      maxLevel: 5,
+      baseUpgradeCost: 500,
+      bonusPerLevel: 0.2
+    };
+
+    let storageUpgrades = 0;
+    let storageCost = 300;
+    let limitedOffers = new Map();
+
     function upgradeResellAgent() {
       const cost = resellAgent.baseUpgradeCost * Math.pow(2, resellAgent.level - 1);
       
@@ -3230,6 +3235,8 @@
         getBonusText: (level) => `Clicks ${level} time${level === 1 ? '' : 's'} per second for coins`
       }
     ];
+
+    let hiredStaff = [];
 
     function showBreakingNews(message, duration = 5000) {
       const newsElement = document.getElementById('breaking-news');
@@ -4042,7 +4049,8 @@
       originalFinishPackOpening();
     }
 
-  
+    // --- Sneakers Database for AI Trades and Market ---
+    let sneakersDatabase = [];
     (function generateSneakersDatabase() {
       const rarityPool = [];
       rarities.forEach(r => {
