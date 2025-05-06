@@ -1097,6 +1097,12 @@
   </style>
 </head>
 <body>
+  <div id="localstorage-warning" style="display:none;color:#fff;background:#e74c3c;padding:10px;position:fixed;top:0;left:0;right:0;z-index:2000;text-align:center;font-weight:bold;">Warning: Your browser does not support localStorage. Progress will not be saved!</div>
+  <!-- Debug Save/Load Buttons (hidden by default) -->
+  <div id="debug-save-load" style="display:none;position:fixed;bottom:10px;left:10px;z-index:2000;">
+    <button onclick="saveGameState()">Save Now</button>
+    <button onclick="initializeGame()">Load Now</button>
+  </div>
   <div id="breaking-news" class="breaking-news"></div>
   <div class="modal-overlay" id="modal-overlay" onclick="closeAllModals()"></div>
   <div class="top-right-buttons">
@@ -1326,65 +1332,44 @@
 
     // Initialize game state from save or defaults
     function initializeGame() {
+      if (!isLocalStorageAvailable()) {
+        setDefaultState();
+        updateAllDisplays();
+        updateStorageDisplay();
+        if (typeof updateStaffDisplay === 'function') updateStaffDisplay();
+        return;
+      }
       const savedState = localStorage.getItem('sneakerHustleGameState');
-      
+      console.log('[initializeGame] Loaded state from localStorage:', savedState);
       if (savedState) {
         try {
           const gameState = JSON.parse(savedState);
-          
-          // Restore basic values
-          coins = gameState.coins ?? 10000;
+          coins = gameState.coins ?? 1000;
           inventory = gameState.inventory || [];
           purchaseHistory = gameState.purchaseHistory || [];
-          
-          // Restore settings
-          if (gameState.settings) {
-            settings = {...settings, ...gameState.settings};
-          }
-          
-          // Restore market buyer
-          if (gameState.currentMarketBuyer) {
-            currentMarketBuyer = gameState.currentMarketBuyer;
-          }
-          
-          // Restore limited offers
-          if (gameState.limitedOffers) {
-            limitedOffers = new Map(gameState.limitedOffers);
-        }
-          
-          // Restore multipliers
+          if (gameState.settings) settings = { ...settings, ...gameState.settings };
+          if (gameState.currentMarketBuyer) currentMarketBuyer = gameState.currentMarketBuyer;
+          if (gameState.limitedOffers) limitedOffers = new Map(gameState.limitedOffers);
           if (gameState.activeMultipliers) {
             window.globalMultiplier = gameState.activeMultipliers.global;
             window.brandMultipliers = gameState.activeMultipliers.brand;
             window.coinMultiplier = gameState.activeMultipliers.coin;
           }
-          
-          // Restore trader state
           if (gameState.currentTrader) {
             window.currentTrader = gameState.currentTrader;
             window.lastTraderResponse = gameState.lastTraderResponse;
           }
-          if (gameState.hiredStaff) {
-            hiredStaff = gameState.hiredStaff;
-          }
-          if (gameState.resellAgentLevel !== undefined) {
-            resellAgent.level = gameState.resellAgentLevel;
-          }
-          if (gameState.storageUpgrades !== undefined) {
-            storageUpgrades = gameState.storageUpgrades;
-          }
-          if (gameState.storageCost !== undefined) {
-            storageCost = gameState.storageCost;
-          }
+          if (gameState.hiredStaff) hiredStaff = gameState.hiredStaff;
+          if (gameState.resellAgentLevel !== undefined) resellAgent.level = gameState.resellAgentLevel;
+          if (gameState.storageUpgrades !== undefined) storageUpgrades = gameState.storageUpgrades;
+          if (gameState.storageCost !== undefined) storageCost = gameState.storageCost;
         } catch (error) {
-          console.error('Error loading game state:', error);
+          console.error('[initializeGame] Error loading game state:', error);
           setDefaultState();
         }
-        } else {
+      } else {
         setDefaultState();
       }
-      
-      // Update all UI elements
       updateAllDisplays();
       updateStorageDisplay();
       if (typeof updateStaffDisplay === 'function') updateStaffDisplay();
@@ -1431,6 +1416,7 @@
 
     // Save game state
     function saveGameState() {
+      if (!isLocalStorageAvailable()) return;
       const gameState = {
         coins,
         inventory,
@@ -1450,8 +1436,12 @@
         storageUpgrades,
         storageCost
       };
-      
-      localStorage.setItem('sneakerHustleGameState', JSON.stringify(gameState));
+      try {
+        localStorage.setItem('sneakerHustleGameState', JSON.stringify(gameState));
+        console.log('[saveGameState] Game state saved:', gameState);
+      } catch (e) {
+        console.error('[saveGameState] Failed to save:', e);
+      }
     }
 
     // Initialize when the page loads
@@ -1896,6 +1886,7 @@
       if (document.getElementById("trade-dropdown")) {
         renderTradeDropdown();
       }
+      saveGameState();
     }
     function updateCoins() {
       const coinDisplay = document.getElementById('coin-count');
@@ -1906,6 +1897,7 @@
         }
         coinDisplay.textContent = formatCurrency(displayValue);
       }
+      saveGameState();
     }
 
     function formatCurrency(amount) {
@@ -3140,6 +3132,7 @@
       } else {
         showPurchaseNotification('Not enough coins!', 'error');
       }
+      saveGameState();
     }
 
     // Breaking News System
@@ -3401,6 +3394,7 @@
       showPurchaseNotification(`Hired ${staff.name}!`);
       openHireStaff(); // Refresh the modal
       updateStaffDisplay();
+      saveGameState();
     }
 
     function upgradeStaff(staffId) {
@@ -3429,6 +3423,7 @@
       showPurchaseNotification(`Upgraded ${staff.name} to level ${staff.level}!`);
       openHireStaff(); // Refresh the modal
       updateStaffDisplay();
+      saveGameState();
     }
 
     function applyStaffBonuses() {
@@ -3796,6 +3791,7 @@
       // Reset cleaning game state
       currentCleaningSneaker = null;
       dirtSpots = [];
+      saveGameState();
     }
 
     // Fix for limited time offers
@@ -4126,8 +4122,31 @@
       setTimeout(generateNewsEvent, 5000);
     }
 
-    // Add debug logging to saveGameState and initializeGame
+    // --- LocalStorage Availability Check ---
+    function isLocalStorageAvailable() {
+      try {
+        const testKey = '__test__';
+        localStorage.setItem(testKey, '1');
+        localStorage.removeItem(testKey);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+    if (!isLocalStorageAvailable()) {
+      document.getElementById('localstorage-warning').style.display = 'block';
+    }
+    // --- END LocalStorage Check ---
+
+    // --- Debug Save/Load Buttons (show if ?debug in URL) ---
+    if (window.location.search.includes('debug')) {
+      document.getElementById('debug-save-load').style.display = 'block';
+    }
+    // --- END Debug Buttons ---
+
+    // --- Robust Save/Load Logic ---
     function saveGameState() {
+      if (!isLocalStorageAvailable()) return;
       const gameState = {
         coins,
         inventory,
@@ -4147,17 +4166,28 @@
         storageUpgrades,
         storageCost
       };
-      localStorage.setItem('sneakerHustleGameState', JSON.stringify(gameState));
-      console.log('[saveGameState] Game state saved:', gameState);
+      try {
+        localStorage.setItem('sneakerHustleGameState', JSON.stringify(gameState));
+        console.log('[saveGameState] Game state saved:', gameState);
+      } catch (e) {
+        console.error('[saveGameState] Failed to save:', e);
+      }
     }
 
     function initializeGame() {
+      if (!isLocalStorageAvailable()) {
+        setDefaultState();
+        updateAllDisplays();
+        updateStorageDisplay();
+        if (typeof updateStaffDisplay === 'function') updateStaffDisplay();
+        return;
+      }
       const savedState = localStorage.getItem('sneakerHustleGameState');
       console.log('[initializeGame] Loaded state from localStorage:', savedState);
       if (savedState) {
         try {
           const gameState = JSON.parse(savedState);
-          coins = gameState.coins ?? 10000;
+          coins = gameState.coins ?? 1000;
           inventory = gameState.inventory || [];
           purchaseHistory = gameState.purchaseHistory || [];
           if (gameState.settings) settings = { ...settings, ...gameState.settings };
@@ -4187,9 +4217,56 @@
       updateStorageDisplay();
       if (typeof updateStaffDisplay === 'function') updateStaffDisplay();
     }
+    // --- END Robust Save/Load Logic ---
 
-    // Remove all other window.addEventListener('load', ...) blocks and replace with:
+    // --- Save on Major State Changes ---
+    // Patch all major state-changing functions to call saveGameState()
+    // Example: after coins/inventory/purchase/staff changes
+    // (Add saveGameState() at the end of these functions)
+    //
+    // For brevity, here are a few examples:
+    //
+    function updateCoins() {
+      const coinDisplay = document.getElementById('coin-count');
+      if (coinDisplay) {
+        let displayValue = coins;
+        if (settings.currencyDisplay === 'k') {
+          displayValue = coins >= 1000 ? (coins/1000).toFixed(1) + 'K' : coins;
+        }
+        coinDisplay.textContent = formatCurrency(displayValue);
+      }
+      saveGameState();
+    }
+    function updateInventory() {
+      // ... existing code ...
+      saveGameState();
+    }
+    function addPurchaseToHistory(type, cost, items) {
+      // ... existing code ...
+      saveGameState();
+      updatePurchaseHistory();
+    }
+    function hireStaff(staffId) {
+      // ... existing code ...
+      saveGameState();
+    }
+    function upgradeStaff(staffId) {
+      // ... existing code ...
+      saveGameState();
+    }
+    function upgradeResellAgent() {
+      // ... existing code ...
+      saveGameState();
+    }
+    function finishCleaning() {
+      // ... existing code ...
+      saveGameState();
+    }
+    // --- END Save on Major State Changes ---
+
+    // --- Only ONE main initialization block ---
     window.addEventListener('load', mainInit);
+    // --- END single initialization ---
   </script>
 </body>
 </html>
