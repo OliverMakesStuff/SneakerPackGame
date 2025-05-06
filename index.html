@@ -2466,22 +2466,39 @@
           s.dynamicValue : s.baseValue);
       }, 0);
 
+      // Calculate preference score for the offered sneakers
+      let preferenceBonus = 0;
+      yourSneakers.forEach(sneaker => {
+        // Brand preference check
+        if (currentTrader.preferences.some(pref => 
+          sneaker.brand.includes(pref) || 
+          sneaker.model.includes(pref)
+        )) {
+          preferenceBonus += 0.15; // 15% bonus per preferred brand/model
+        }
+        
+        // Rarity preference check
+        if (currentTrader.preferences.some(pref => 
+          sneaker.rarity.toLowerCase() === pref.toLowerCase()
+        )) {
+          preferenceBonus += 0.2; // 20% bonus for preferred rarity
+        }
+        
+        // Style match check
+        if ((currentTrader.style === 'hype' && (sneaker.rarity === 'legendary' || sneaker.rarity === 'epic')) ||
+            (currentTrader.style === 'budget' && (sneaker.rarity === 'common' || sneaker.rarity === 'rare')) ||
+            (currentTrader.style === 'luxury' && sneaker.rarity === 'legendary') ||
+            (currentTrader.style === 'classic' && (sneaker.brand === 'Nike' || sneaker.brand === 'Jordan' || sneaker.brand === 'Converse'))) {
+          preferenceBonus += 0.1; // 10% bonus for style match
+        }
+      });
+
       // Calculate target value based on trader preferences
       let targetTotalValue = yourTotalValue * adjustment;
       
-      // Adjust value based on how many preferred items are being offered
-      const preferredCount = yourSneakers.filter(s => 
-        currentTrader.preferences.some(pref => 
-          s.brand.includes(pref) || 
-          s.rarity.toLowerCase() === pref.toLowerCase()
-        )
-      ).length;
+      // Apply preference bonus
+      targetTotalValue *= (1 + preferenceBonus);
       
-      // Bonus for preferred items
-      if (preferredCount > 0) {
-        targetTotalValue *= (1 + (preferredCount * 0.15)); // 15% bonus per preferred item
-      }
-
       // Apply trader value preference
       switch(currentTrader.valuePreference) {
         case 'low':
@@ -2497,14 +2514,53 @@
           targetTotalValue *= 1.5;
           break;
       }
+      
+      // Check for specific negotiation messages in the chat
+      const chatMsgs = document.querySelectorAll('.trade-chat-msg.player-msg');
+      let chatBonus = 0;
+      
+      chatMsgs.forEach(msgElement => {
+        const msgText = msgElement.textContent.toLowerCase();
+        
+        // Negotiations that improve the offer
+        if (msgText.includes('rare') || msgText.includes('legendary') || msgText.includes('limited')) {
+          if (currentTrader.style === 'hype' || currentTrader.style === 'luxury') {
+            chatBonus += 0.05;
+          }
+        }
+        
+        if (msgText.includes('classic') || msgText.includes('vintage') || msgText.includes('retro')) {
+          if (currentTrader.style === 'classic') {
+            chatBonus += 0.07;
+          }
+        }
+        
+        if (msgText.includes('deal') || msgText.includes('fair')) {
+          chatBonus += 0.03;
+        }
+        
+        // Negotiations that may reduce the offer
+        if (msgText.includes('cheap') || msgText.includes('low')) {
+          if (currentTrader.style === 'luxury') {
+            chatBonus -= 0.1;
+          } else if (currentTrader.style === 'budget') {
+            chatBonus += 0.05;
+          }
+        }
+      });
+      
+      // Apply chat negotiation bonus
+      targetTotalValue *= (1 + chatBonus);
 
       // Generate AI offer
       aiTradeOffer = [];
       
-      // Get preferred sneakers that match trader's style and preferences
+      // Create a pool of preferred sneakers that match trader's style and preferences
       const preferredSneakers = sneakersDatabase.filter(s => {
+        // Check brand & model preferences
         const matchesPreference = currentTrader.preferences.some(pref => 
           s.brand.includes(pref) || 
+          s.model.includes(pref) ||
           s.rarity.toLowerCase() === pref.toLowerCase()
         );
         
@@ -2513,34 +2569,66 @@
           (currentTrader.style === 'hype' && (s.rarity === 'legendary' || s.rarity === 'epic')) ||
           (currentTrader.style === 'budget' && (s.rarity === 'common' || s.rarity === 'rare')) ||
           (currentTrader.style === 'luxury' && s.rarity === 'legendary') ||
-          (currentTrader.style === 'classic' && s.brand === 'Nike' || s.brand === 'Jordan')
+          (currentTrader.style === 'classic' && (s.brand === 'Nike' || s.brand === 'Jordan' || s.brand === 'Converse'))
         );
         
         return matchesPreference || matchesStyle;
       });
+      
+      // Sort the preferred sneakers by how well they match the trader's preferences
+      preferredSneakers.sort((a, b) => {
+        const scoreA = getPreferenceScore(a);
+        const scoreB = getPreferenceScore(b);
+        return scoreB - scoreA;  // Higher score first
+      });
 
-      // Try to offer preferred sneakers first
+      // Try to offer preferred sneakers first (heavily favoring preferences)
       while (aiTradeOffer.length < 3 && preferredSneakers.length > 0 && targetTotalValue > 0) {
-        const index = Math.floor(Math.random() * preferredSneakers.length);
-        const sneaker = preferredSneakers[index];
+        // Take sneakers from the front of the sorted array (highest preference)
+        const sneaker = preferredSneakers.shift();
         
-        if (sneaker.baseValue <= targetTotalValue) {
+        if (sneaker.baseValue <= targetTotalValue * 1.5) { // Allow slightly higher values for preferred items
           aiTradeOffer.push({...sneaker, id: Date.now() + Math.random()});
           targetTotalValue -= sneaker.baseValue;
-          preferredSneakers.splice(index, 1);
-        } else {
-          break;
         }
       }
 
-      // Fill remaining slots with any affordable sneakers
-      while (aiTradeOffer.length < 3 && targetTotalValue > 0) {
-        const affordable = sneakersDatabase.filter(s => s.baseValue <= targetTotalValue);
-        if (affordable.length === 0) break;
+      // Fill remaining slots with affordable sneakers that somewhat match preferences
+      if (aiTradeOffer.length < 3 && targetTotalValue > 0) {
+        const remainingSneakers = sneakersDatabase.filter(s => 
+          !aiTradeOffer.some(offered => 
+            offered.brand === s.brand && offered.model === s.model && offered.rarity === s.rarity
+          ) && s.baseValue <= targetTotalValue
+        );
         
-        const sneaker = affordable[Math.floor(Math.random() * affordable.length)];
-        aiTradeOffer.push({...sneaker, id: Date.now() + Math.random()});
-        targetTotalValue -= sneaker.baseValue;
+        // Sort by preference but to a lesser degree
+        remainingSneakers.sort((a, b) => {
+          const scoreA = getPreferenceScore(a) / 2; // Lower weight on preference
+          const scoreB = getPreferenceScore(b) / 2;
+          return scoreB - scoreA;
+        });
+        
+        // Add remaining sneakers
+        for (let i = 0; i < remainingSneakers.length && aiTradeOffer.length < 3 && targetTotalValue > 0; i++) {
+          const sneaker = remainingSneakers[i];
+          if (sneaker.baseValue <= targetTotalValue) {
+            aiTradeOffer.push({...sneaker, id: Date.now() + Math.random()});
+            targetTotalValue -= sneaker.baseValue;
+          }
+        }
+      }
+      
+      // If we still don't have 3 items, add some lower value items
+      if (aiTradeOffer.length < 3) {
+        const budgetSneakers = sneakersDatabase.filter(s => 
+          !aiTradeOffer.some(offered => 
+            offered.brand === s.brand && offered.model === s.model && offered.rarity === s.rarity
+          ) && s.rarity === 'common'
+        ).sort(() => Math.random() - 0.5);
+        
+        for (let i = 0; i < budgetSneakers.length && aiTradeOffer.length < 3; i++) {
+          aiTradeOffer.push({...budgetSneakers[i], id: Date.now() + Math.random()});
+        }
       }
 
       updateTradeComparison();
@@ -2558,23 +2646,34 @@
     }
 
     function getPreferenceScore(sneaker) {
+      if (!currentTrader) return 0;
+      
       let score = 0;
       
-      // Brand preference
-      if (currentTrader.preferences.some(pref => sneaker.brand.includes(pref))) {
-        score += 3;
-      }
+      // Brand & model preference
+      currentTrader.preferences.forEach(pref => {
+        if (sneaker.brand.includes(pref) || sneaker.model.includes(pref)) {
+          score += 3;
+        }
+      });
       
       // Rarity preference
-      if (currentTrader.additionalPreferences.rarities.includes(sneaker.rarity)) {
-        score += 2;
-      }
+      currentTrader.preferences.forEach(pref => {
+        if (sneaker.rarity.toLowerCase() === pref.toLowerCase()) {
+          score += 2;
+        }
+      });
       
-      // Value preference
-      const value = sneaker.baseValue;
-      if (value >= currentTrader.additionalPreferences.minValue && 
-          value <= currentTrader.additionalPreferences.maxValue) {
-        score += 2;
+      // Style match
+      if (currentTrader.style === 'hype' && (sneaker.rarity === 'legendary' || sneaker.rarity === 'epic')) {
+        score += 3;
+      } else if (currentTrader.style === 'budget' && (sneaker.rarity === 'common' || sneaker.rarity === 'rare')) {
+        score += 3;
+      } else if (currentTrader.style === 'luxury' && sneaker.rarity === 'legendary') {
+        score += 4;
+      } else if (currentTrader.style === 'classic' && 
+                (sneaker.brand === 'Nike' || sneaker.brand === 'Jordan' || sneaker.brand === 'Converse')) {
+        score += 3;
       }
       
       return score;
@@ -2916,52 +3015,79 @@
 
       let responseText;
       let willing = false;
+      let adjustment = 1.0;
 
+      // Check message keywords
+      const msgLower = message.toLowerCase();
+      let preferenceMatched = false;
+      
+      // Check if message mentions any of the trader's preferences
+      currentTrader.preferences.forEach(pref => {
+        if (msgLower.includes(pref.toLowerCase())) {
+          preferenceMatched = true;
+        }
+      });
+      
       // Personality-based responses
-      const responses = {
-        hype: [
-          "This trade isn't hype enough for me.",
-          "Now we're talking! Let me adjust my offer.",
-          "These are straight fire! Let's make this happen!"
-        ],
-        classic: [
-          "I prefer the timeless classics. Let me reconsider.",
-          "These have potential. Here's my counter-offer.",
-          "A classic trade! I can work with this."
-        ],
-        luxury: [
-          "I only deal in premium items. Let me see what else you have.",
-          "Getting closer to what I'm looking for.",
-          "Now this is the luxury I expect!"
-        ],
-        budget: [
-          "A bit out of my price range. Got anything cheaper?",
-          "This could work with some adjustments.",
-          "Perfect for my budget collection!"
-        ]
-      };
-
-      if (valueRatio > 0.9) {
+      if (preferenceMatched) {
+        // More likely to adjust if you mention their preferences
         willing = Math.random() < 0.8;
-        responseText = willing ? responses[currentTrader.style][2] : "I think this is already a fair offer.";
-      } else if (valueRatio > 0.7) {
+        adjustment = 1.05; // Better offer when you mention their preferences
+        
+        if (currentTrader.style === 'hype') {
+          responseText = "You know what I like! Let me see what I can offer.";
+        } else if (currentTrader.style === 'luxury') {
+          responseText = "I see you understand quality. I might have something special for you.";
+        } else if (currentTrader.style === 'classic') {
+          responseText = "A fellow enthusiast! I'll reconsider my offer.";
+        } else {
+          responseText = "That's exactly what I'm looking for! Let me adjust my offer.";
+        }
+      } else if (msgLower.includes("deal") || msgLower.includes("fair")) {
+        // Checking for deal-closing terms
+        if (valueRatio > 0.9) {
+          willing = true;
+          responseText = "You're right, this is a fair deal. Let's do it!";
+        } else {
+          willing = false;
+          responseText = "I don't think we're quite there yet. The values don't match up.";
+        }
+      } else if (msgLower.includes("add") || msgLower.includes("more") || msgLower.includes("better")) {
+        // Asking for more
         willing = Math.random() < 0.6;
-        responseText = willing ? responses[currentTrader.style][1] : "The value gap is a bit too wide for me.";
+        adjustment = 1.1; // Offer more
+        responseText = willing ? 
+          "I can sweeten the deal a bit. Check this out." : 
+          "I'm already offering the best I can right now.";
       } else {
-        willing = Math.random() < 0.3;
-        responseText = responses[currentTrader.style][0];
+        // Standard value-based response
+        if (valueRatio > 0.9) {
+          willing = Math.random() < 0.8;
+          adjustment = 1.0;
+          responseText = willing ? 
+            "I think we're close to a deal." : 
+            "I think this is already a fair offer.";
+        } else if (valueRatio > 0.7) {
+          willing = Math.random() < 0.6;
+          adjustment = 0.95;
+          responseText = willing ? 
+            "Let me adjust my offer a bit." : 
+            "The value gap is a bit too wide for me.";
+        } else {
+          willing = Math.random() < 0.3;
+          adjustment = 0.9;
+          responseText = "I'm not sure about this trade value.";
+        }
       }
 
       response.innerHTML = `${currentTrader.emoji} ${currentTrader.name}: "${responseText}"`;
 
       if (willing) {
-        const adjustment = valueRatio > 0.8 ? 0.95 : 0.9;
         generateAITradeOffer(adjustment);
       }
 
-      updateNegotiationOptions();
       appendTradeChatMessage('player', message);
-      appendTradeChatMessage('ai', getAIResponse(message));
+      appendTradeChatMessage('ai', responseText);
     }
 
     function updateNegotiationOptions() {
@@ -3888,35 +4014,52 @@
     }
 
     function getAIResponse(playerMsg) {
+      if (!currentTrader) return "Hello there!";
+      
       const msg = playerMsg.toLowerCase();
+      let response = "";
+      
+      // Check for preference matches in the message
+      let mentionedPreference = false;
+      currentTrader.preferences.forEach(pref => {
+        if (msg.includes(pref.toLowerCase())) {
+          mentionedPreference = true;
+        }
+      });
+      
+      if (mentionedPreference) {
+        return [
+          `You really know what I'm looking for! I love ${currentTrader.preferences[0]}.`,
+          `Ah, a fellow ${currentTrader.preferences[0]} enthusiast! Let's talk.`,
+          `You're speaking my language with that ${currentTrader.preferences[0]} mention!`
+        ][Math.floor(Math.random()*3)];
+      }
+      
+      // Style-specific responses to common message types
       if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey')) {
-        return [
-          "Hey there! Ready to make a deal?",
-          "Hello! What are you looking to trade today?",
-          "Hi! Let's see what you've got."
-        ][Math.floor(Math.random()*3)];
+        if (currentTrader.style === 'hype') {
+          return "What's up! Ready to see some fire kicks?";
+        } else if (currentTrader.style === 'luxury') {
+          return "Greetings. I trust you've brought items of quality?";
+        } else if (currentTrader.style === 'classic') {
+          return "Hello there! Always good to meet another sneaker enthusiast.";
+        } else { // budget
+          return "Hey! Got any good deals for me today?";
+        }
       }
+      
       if (msg.includes('value') || msg.includes('worth')) {
-        return [
-          "I'm always looking for value. That one is pretty nice!",
-          "Value is subjective, but I know a good deal when I see one.",
-          "Depends on the market, but that's a solid sneaker."
-        ][Math.floor(Math.random()*3)];
+        if (currentTrader.style === 'hype') {
+          return "Value? It's all about the hype, friend!";
+        } else if (currentTrader.style === 'luxury') {
+          return "I only deal in premium items. Quality has its price.";
+        } else if (currentTrader.style === 'classic') {
+          return "True value is in the history and quality of a classic piece.";
+        } else { // budget
+          return "I'm looking for the best bang for my buck, you know?";
+        }
       }
-      if (msg.includes('add') || msg.includes('more')) {
-        return [
-          "Maybe if you add something extra, I'll consider it.",
-          "Sweeten the deal and we might have a trade.",
-          "What else can you offer?"
-        ][Math.floor(Math.random()*3)];
-      }
-      if (msg.includes('rare') || msg.includes('legendary')) {
-        return [
-          "Rare kicks always catch my eye!",
-          "Legendary? Now you're talking!",
-          "Those are hard to come by."
-        ][Math.floor(Math.random()*3)];
-      }
+      
       if (msg.includes('deal') || msg.includes('accept')) {
         return [
           "Deal! Pleasure doing business.",
@@ -3924,43 +4067,38 @@
           "You've got yourself a deal!"
         ][Math.floor(Math.random()*3)];
       }
-      if (msg.includes('bye') || msg.includes('later')) {
-        return [
-          "See you next time!",
-          "Catch you later!",
-          "Goodbye!"
-        ][Math.floor(Math.random()*3)];
-      }
-      // Default fallback: personality-based
-      if (currentTrader && currentTrader.style === 'hype') {
+      
+      // Default responses based on trader style
+      if (currentTrader.style === 'hype') {
         return [
           "That's fire! But is it enough?",
           "I'm all about the hype, show me something exclusive.",
           "Not bad, but I want the latest drops."
         ][Math.floor(Math.random()*3)];
       }
-      if (currentTrader && currentTrader.style === 'classic') {
+      if (currentTrader.style === 'classic') {
         return [
           "Classic taste! But let's see if it's worth it.",
           "I respect the classics, but I need more.",
           "Old school, but is it gold?"
         ][Math.floor(Math.random()*3)];
       }
-      if (currentTrader && currentTrader.style === 'luxury') {
+      if (currentTrader.style === 'luxury') {
         return [
           "Luxury is my game. Impress me!",
           "Only the finest for me.",
           "Is that premium enough?"
         ][Math.floor(Math.random()*3)];
       }
-      if (currentTrader && currentTrader.style === 'budget') {
+      if (currentTrader.style === 'budget') {
         return [
           "I'm on a budget, but I like a good deal.",
           "Can you make it cheaper?",
           "Looking for bargains!"
         ][Math.floor(Math.random()*3)];
       }
-      // Otherwise, generic
+      
+      // Fallback generic response
       return [
         "Interesting offer!",
         "Let me think about that...",
