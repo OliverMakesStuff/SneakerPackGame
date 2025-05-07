@@ -2184,12 +2184,13 @@
       const lastClaim = localStorage.getItem('dailyReward');
       const now = Date.now();
       if (!lastClaim || now - lastClaim > 86400000) {
-        coins += 300;
+        const reward = Math.floor(300 * (1 + 0.10 * prestigeLevel));
+        coins += reward;
         localStorage.setItem('dailyReward', now);
         updateCoins();
-        showNotification("Daily reward claimed!");
+        showPurchaseNotification(`Daily reward claimed! +${reward} coins`);
       } else {
-        showNotification("Already claimed today!");
+        showPurchaseNotification("Already claimed today!", "error");
       }
     }
 
