@@ -1409,7 +1409,7 @@
 
     // Set default state for new games
     function setDefaultState() {
-      coins = 100000000
+      coins = 1000
       inventory = [];
       purchaseHistory = [];
       settings = {
@@ -2120,8 +2120,21 @@
       const pack = packTypes[type];
       let roll = Math.random();
       if (upgrades.betterOdds) roll += 0.05;
+      let odds = {...pack.odds};
+      if (prestigeLevel > 0) {
+        let bonus = 0.05 * prestigeLevel;
+        if (odds.rare) odds.rare += bonus;
+        if (odds.epic) odds.epic += bonus;
+        if (odds.legendary) odds.legendary += bonus;
+        // Subtract total bonus from common
+        if (odds.common) odds.common = Math.max(0, odds.common - bonus * 3);
+        // Normalize if total > 1
+        let total = Object.values(odds).reduce((a, b) => a + b, 0);
+        if (total > 1) {
+          Object.keys(odds).forEach(k => odds[k] /= total);
+        }
+      }
       let rarity = "common";
-      let odds = pack.odds;
       let sum = 0;
       for (let key of ["common", "rare", "epic", "legendary"]) {
         if (odds[key]) {
@@ -2132,7 +2145,6 @@
           }
         }
       }
-      // If colorway pack, just use random colorway
       return getRandomSneaker(rarity);
     }
 
@@ -2161,7 +2173,7 @@
       const bonus = 1 + (resellAgent.level * resellAgent.bonusPerLevel);
       value = Math.floor(value * bonus);
       
-      coins += Math.floor(value * (1 + prestigeLevel * 0.02));
+      coins += Math.floor(value * (1 + 0.10 * prestigeLevel));
       inventory.splice(index, 1); // Remove the sneaker from inventory
       updateCoins();
       updateInventory();
@@ -3541,7 +3553,7 @@
             const sneaker = inventory[sneakerIdx];
             // Trade value improves with level
             let tradeValue = sneaker.baseValue * (1 + 0.1 * autoBuyer.level);
-            coins += Math.floor(tradeValue * (1 + prestigeLevel * 0.02));
+            coins += Math.floor(tradeValue * (1 + 0.10 * prestigeLevel));
             inventory.splice(sneakerIdx, 1);
           }
         }
@@ -3611,15 +3623,23 @@
     let clickProgress = 0;
     function handleClick() {
       clickCount++;
-      clickProgress++;
       document.querySelector('.click-count').textContent = `Clicks: ${clickCount}`;
-      if (clickProgress >= clicksPerCoin) {
-        coins += 1;
-        clickProgress = 0;
+      if (prestigeLevel > 0) {
+        coins += prestigeLevel;
         updateCoins();
-        showPurchaseNotification("+1 coin!");
+        showPurchaseNotification(`+${prestigeLevel} coin${prestigeLevel > 1 ? 's' : ''}!`);
       } else {
-        updateCoins();
+        // Before first prestige, 1 coin every 2 clicks
+        if (!window.clickProgress) window.clickProgress = 0;
+        window.clickProgress++;
+        if (window.clickProgress >= 2) {
+          coins += 1;
+          window.clickProgress = 0;
+          updateCoins();
+          showPurchaseNotification("+1 coin!");
+        } else {
+          updateCoins();
+        }
       }
     }
 
@@ -3935,8 +3955,8 @@
     // Implement auto clicker interval
     setInterval(() => {
       if (autoClickerRate > 0) {
-        let effectiveAutoClickerRate = autoClickerRate * (1 + prestigeLevel * 0.02);
-        coins += effectiveAutoClickerRate;
+        let effectiveAutoClickerRate = autoClickerRate;
+        coins += effectiveAutoClickerRate * (1 + 0.10 * prestigeLevel);
         clickCount += effectiveAutoClickerRate;
         updateCoins();
         document.querySelector('.click-count').textContent = `Clicks: ${clickCount}`;
@@ -4264,7 +4284,7 @@
     function getDiscountedPackPrice(packKey) {
       const base = packTypes[packKey].cost;
       let discount = packPriceMultiplier;
-      discount *= (1 - prestigeLevel * 0.02); // 2% per prestige
+      discount *= (1 - 0.10 * prestigeLevel); // 10% per prestige
       return Math.floor(base * discount);
     }
 
