@@ -2539,18 +2539,19 @@
       // Calculate target value based on trader preferences
       let targetTotalValue = yourTotalValue * adjustment;
       
-      // Adjust value based on how many preferred items are being offered
-      const preferredCount = yourSneakers.filter(s => 
-        currentTrader.preferences.some(pref => 
-          s.brand.includes(pref) || 
-          s.rarity.toLowerCase() === pref.toLowerCase()
-        )
-      ).length;
-      
-      // Bonus for preferred items
-      if (preferredCount > 0) {
-        targetTotalValue *= (1 + (preferredCount * 0.15)); // 15% bonus per preferred item
-      }
+      // Over-offer for each matching trait, under-offer for each non-matching trait
+      let bonusMultiplier = 1;
+      yourSneakers.forEach(s => {
+        const score = getPreferenceScore(s); // 1 point per match
+        if (score > 0) {
+          bonusMultiplier *= (1 + 0.3 * score); // 30% per match, cumulative
+        } else {
+          // If no matches, under-offer by 20% for each trait (brand, rarity, value, style)
+          // We'll assume 4 possible traits, so apply (1 - 0.2) ^ 4 = 0.4096 if all miss
+          bonusMultiplier *= 0.4096; // 4 traits, all missed
+        }
+      });
+      targetTotalValue *= bonusMultiplier;
 
       // Apply trader value preference
       let valueMultiplier = 1.0;
@@ -2568,7 +2569,7 @@
           valueMultiplier = 1.5;
           break;
       }
-      targetTotalValue = yourTotalValue * adjustment * valueMultiplier;
+      targetTotalValue = yourTotalValue * adjustment * valueMultiplier * bonusMultiplier;
 
       // Generate AI offer
       aiTradeOffer = [];
@@ -2585,7 +2586,7 @@
           (currentTrader.style === 'hype' && (s.rarity === 'legendary' || s.rarity === 'epic')) ||
           (currentTrader.style === 'budget' && (s.rarity === 'common' || s.rarity === 'rare')) ||
           (currentTrader.style === 'luxury' && s.rarity === 'legendary') ||
-          (currentTrader.style === 'classic' && s.brand === 'Nike' || s.brand === 'Jordan')
+          (currentTrader.style === 'classic' && (s.brand === 'Nike' || s.brand === 'Jordan'))
         );
         
         return matchesPreference || matchesStyle;
