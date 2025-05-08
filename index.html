@@ -1101,6 +1101,176 @@
     .trade-chat-msg.player-msg { background: #2980b9; color: #fff; text-align: right; }
     /* Trade chat: hacker font */
     .trade-chat, .trade-chat-msg { font-family: 'Fira Mono', 'Consolas', 'monospace'; letter-spacing: 0.5px; }
+
+    /* --- SIDEBAR LAYOUT --- */
+    .game-layout {
+      display: flex;
+      min-height: 100vh;
+      width: 100vw;
+      align-items: stretch;
+      justify-content: stretch;
+    }
+    .sidebar {
+      background: linear-gradient(135deg, #232b3b 80%, #2980b9 100%);
+      color: #fff;
+      width: 420px;
+      min-width: 420px;
+      max-width: 520px;
+      padding: 32px 18px 32px 18px;
+      box-shadow: 2px 0 16px 0 rgba(44,62,80,0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+      height: 100vh;
+      overflow-x: hidden;
+      flex-shrink: 0;
+    }
+    .sidebar .big-clicker {
+      width: 200px;
+      height: 200px;
+      font-size: 2.8em;
+      margin: 0 0 32px 0;
+      border-radius: 50%;
+      box-shadow: 0 8px 32px 0 rgba(39,174,96,0.25);
+      background: linear-gradient(135deg, #27ae60 80%, #2ecc71 100%);
+      color: #fff;
+      border: none;
+      transition: transform 0.1s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 1/1;
+    }
+    .sidebar .big-clicker:active {
+      transform: scale(0.97);
+      box-shadow: 0 2px 8px 0 rgba(39,174,96,0.15);
+    }
+    .sidebar-coins {
+      margin: 18px 0 18px 0;
+      font-size: 2.2em;
+      font-weight: bold;
+      letter-spacing: 1px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .sidebar-coins-label {
+      font-size: 0.6em;
+      color: #f1c40f;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .sidebar-coins-value {
+      font-size: 1.2em;
+      color: #fff;
+      text-shadow: 0 2px 8px #222;
+    }
+    .sidebar-prestige {
+      width: 100%;
+      margin-bottom: 18px;
+      padding: 12px 0 12px 0;
+      border-bottom: 1px solid #34495e;
+    }
+    .sidebar-inventory {
+      width: 100%;
+      margin-top: 18px;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      max-height: 50vh;
+      margin-top: auto;
+      overflow-x: hidden;
+    }
+    .sidebar-inventory h2 {
+      font-size: 1.2em;
+      margin-bottom: 8px;
+      color: #f1c40f;
+      letter-spacing: 1px;
+    }
+    .sidebar-inventory .inventory-list-flex {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      justify-content: flex-start;
+      overflow-x: hidden;
+    }
+    .main-content {
+      flex: 1 1 0%;
+      background: #2c3e50;
+      min-height: 100vh;
+      padding: 0 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      position: relative;
+      height: 100vh;
+    }
+    .main-content header {
+      background: none;
+      margin: 0;
+      padding: 32px 0 0 0;
+      text-align: left;
+    }
+    .main-content h1 {
+      margin: 0 0 16px 32px;
+      font-size: 2.2em;
+      color: #fff;
+      letter-spacing: 2px;
+      text-align: left;
+    }
+    .main-content .container {
+      margin: 0 32px 32px 32px;
+      text-align: left;
+    }
+    .main-actions > div {
+      margin-bottom: 32px;
+    }
+    @media (max-width: 900px) {
+      .game-layout { flex-direction: column; }
+      .sidebar { width: 100vw; max-width: 100vw; min-width: 0; flex-direction: row; justify-content: space-around; padding: 16px 0; }
+      .sidebar-inventory { max-height: 200px; }
+      .main-content { padding: 0; }
+      .main-content .container { margin: 0 8px 16px 8px; }
+      .main-content h1 { margin-left: 8px; }
+    }
+    @media (max-width: 600px) {
+      .sidebar { flex-direction: column; align-items: stretch; }
+      .sidebar-inventory { max-height: 120px; }
+      .main-content h1 { font-size: 1.3em; }
+    }
+  </style>
+  <style>
+    /* Prevent text and image selection */
+    body, .game-layout, .sidebar, .main-content, .container, .sneaker-card, .pack-button, .inventory-list-flex, .casino-roll-card, .modal, .modal * {
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      -moz-user-select: none;
+    }
+    img {
+      user-drag: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }
+    /* Allow selection in input, textarea, and select for usability */
+    input, textarea, select {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+      -ms-user-select: text !important;
+      -moz-user-select: text !important;
+      pointer-events: auto !important;
+    }
+    html, body {
+      overflow-x: hidden !important;
+      max-width: 100vw;
+    }
+    .game-layout, .main-content {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
   </style>
 </head>
 <body>
@@ -1110,220 +1280,176 @@
     <button class="history-btn" onclick="openHistory()" title="Purchase History">📜</button>
     <button class="settings-btn" onclick="openSettings()" title="Settings">⚙️</button>
   </div>
-  <header>
-    <h1>Sneaker Pack Tycoon</h1>
-    <div class="coins">Coins: <span id="coin-count">0</span></div>
-    <div class="prestige-bar">
-      Prestige: <span id="prestige-level">0</span>
-      <button id="prestige-btn" class="pack-button" style="margin-left:10px;" onclick="prestigeNow()">Prestige!</button>
-      <div class="prestige-progress-container" style="display:inline-block;vertical-align:middle;width:200px;height:16px;margin-left:16px;background:#444;border-radius:8px;overflow:hidden;">
-        <div id="prestige-progress-bar" style="height:100%;background:#f39c12;width:0%;transition:width 0.5s;"></div>
+  <div class="game-layout">
+    <aside class="sidebar">
+      <button class="clicker-button big-clicker" onclick="handleClick()">
+        Click!
+        <div class="click-count">Clicks: 0</div>
+      </button>
+      <div class="sidebar-coins">
+        <span class="sidebar-coins-label">Coins</span>
+        <span id="coin-count-sidebar" class="sidebar-coins-value">0</span>
       </div>
-      <span id="prestige-next-info" style="margin-left:12px;font-size:14px;color:#f1c40f;"></span>
-    </div>
-  </header>
-  <div class="container">
-    <button class="clicker-button" onclick="handleClick()">
-      Click!
-      <div class="click-count">Clicks: 0</div>
-    </button>
-    <div>
-      <select id="pack-type" class="pack-select">
-        <option value="standard">Standard Pack (100 Coins)</option>
-        <option value="premium">Premium Pack (300 Coins)</option>
-        <option value="colorway">Colorway Pack (200 Coins)</option>
-        <option value="rare">Rare Pack (400 Coins)</option>
-        <option value="epic">Epic Pack (700 Coins)</option>
-        <option value="legendary">Legendary Pack (2500 Coins)</option>
-        <option value="mystery">Mystery Pack (500 Coins)</option>
-        <option value="ultra">Ultra Pack (1200 Coins)</option>
-        <option value="hype">Hype Pack (900 Coins)</option>
-        <option value="classic">Classic Pack (250 Coins)</option>
-        <option value="collab">Collab Pack (1500 Coins)</option>
-        <option value="seasonal">Seasonal Pack (600 Coins)</option>
-        <option value="newrarity">New Rarity Pack (3000 Coins)</option>
-      </select>
-      <select id="pack-multiplier" class="pack-select" style="width:auto;">
-        <option value="1">Open 1x</option>
-        <option value="3">Open 3x</option>
-        <option value="5">Open 5x</option>
-        <option value="10">Open 10x</option>
-      </select>
-      <button class="pack-button" onclick="openPackDropdown()">Open Pack</button>
-      <button class="pack-button" style="margin-left:8px;" onclick="previewPack()">Pack Preview</button>
-    </div>
-    <div class="daily">
-      <h2>Daily Rewards</h2>
-      <button class="pack-button" onclick="claimDaily()">Claim Daily Coins</button>
-    </div>
-    <div class="upgrades">
-      <h2>Store Upgrades</h2>
-      <button class="pack-button" onclick="openUsedMarket()">Browse Used Sneakers</button>
-      <div class="resell-agent">
-        <h3>Resell Agents</h3>
-        <div class="agent-types" id="agent-types">
-          <!-- Agent types will be inserted here -->
-        </div>
-        <div class="agent-level">
-          Level: <div class="level-indicator" id="agent-level"></div>
-        </div>
-        <div class="agent-bonus" id="agent-bonus"></div>
-        <button class="pack-button" id="upgrade-agent-btn" onclick="upgradeResellAgent()">Upgrade Agent</button>
-      </div>
-      <div class="staff-section">
-        <h3>Automated Staff</h3>
-        <button class="pack-button" onclick="openHireStaff()">Hire Staff</button>
-        <div class="staff-grid" id="staff-grid">
-          <!-- Staff members will be inserted here -->
+      <div class="sidebar-prestige">
+        <div class="prestige-bar">
+          Prestige: <span id="prestige-level">0</span>
+          <button id="prestige-btn" class="pack-button" style="margin-left:10px;" onclick="prestigeNow()">Prestige!</button>
+          <div class="prestige-progress-container" style="display:inline-block;vertical-align:middle;width:200px;height:16px;margin-left:16px;background:#444;border-radius:8px;overflow:hidden;">
+            <div id="prestige-progress-bar" style="height:100%;background:#f39c12;width:0%;transition:width 0.5s;"></div>
+          </div>
+          <span id="prestige-next-info" style="margin-left:12px;font-size:14px;color:#f1c40f;"></span>
         </div>
       </div>
-    </div>
-    <div class="inventory">
-      <h2>Your Inventory</h2>
-      <div id="inventory-total-value" style="font-size:18px;margin-bottom:8px;color:#f1c40f;"></div>
-      <div id="inventory-list" class="inventory-list-flex"></div>
-    </div>
-    <div class="trading">
-      <h2>AI Trading System (Sneaker-for-Sneaker)</h2>
-      <button class="pack-button" onclick="openTradeUI()">Enter Trade</button>
-    </div>
-  <div class="modal" id="used-market-modal">
-    <div class="modal-header">
-      <h2>Used Sneaker Market</h2>
-      <button class="close-btn" onclick="closeUsedMarket()">Close</button>
-    </div>
-    <div class="used-market-grid" id="used-market-grid">
-      <!-- Used sneakers will be inserted here -->
-    </div>
-  </div>
-  <div class="cleaning-game" id="cleaning-game">
-    <div class="modal-header">
-      <h2>Clean Your New Sneaker</h2>
-      <button class="close-btn" onclick="finishCleaning()">✕</button>
-    </div>
-    <div class="cleaning-info">
-      <p>Click on the dirt spots to clean them!</p>
-      <div class="condition-bar">
-        <div class="condition-fill" id="cleaning-progress"></div>
+      <div class="sidebar-inventory">
+        <h2>Your Inventory</h2>
+        <button class="pack-button" style="width:100%;margin-bottom:8px;" onclick="sellAllSneakers()">Sell All</button>
+        <div id="inventory-total-value" style="font-size:18px;margin-bottom:8px;color:#f1c40f;"></div>
+        <div id="inventory-list" class="inventory-list-flex"></div>
       </div>
-    </div>
-    <canvas id="sneaker-canvas" class="sneaker-canvas" width="400" height="300"></canvas>
-    <button class="pack-button" onclick="finishCleaning()">Finish Cleaning</button>
-  </div>
-  <div class="modal" id="pack-modal">
-    <div id="modal-content">
-      <h2>Opening Pack...</h2>
-      <div id="card-container" class="card-container"></div>
-      <button id="next-sneaker-btn" onclick="revealNextSneaker()">Next Sneaker</button>
-    </div>
-  </div>
-  <div class="modal" id="trade-modal">
-    <div>
-      <h2>Select Trader</h2>
-      <div class="trader-selection" id="trader-selection">
-        <!-- Trader cards will be inserted here -->
-      </div>
-      <div id="ai-trader" class="ai-trader-info" style="display: none;">
-        <!-- AI trader info will be inserted here -->
-      </div>
-      <div class="trade-selection">
-        <div><b>Select sneakers to offer:</b></div>
-      <select id="trade-dropdown"></select>
-        <button class="pack-button" onclick="addToTrade()">Add to Trade</button>
-        <div id="selected-sneakers" class="selected-sneakers"></div>
-      </div>
-      <div class="trade-comparison">
-        <div class="trade-side" id="your-offer">
-          <h3>Your Offer</h3>
-          <div class="offer-details"></div>
+    </aside>
+    <main class="main-content">
+      <header>
+        <h1>Sneaker Pack Tycoon</h1>
+      </header>
+      <div class="container">
+        <div class="main-actions">
+          <div>
+            <select id="pack-type" class="pack-select">
+              <option value="standard">Standard Pack (100 Coins)</option>
+              <option value="premium">Premium Pack (300 Coins)</option>
+              <option value="colorway">Colorway Pack (200 Coins)</option>
+              <option value="rare">Rare Pack (400 Coins)</option>
+              <option value="epic">Epic Pack (700 Coins)</option>
+              <option value="legendary">Legendary Pack (2500 Coins)</option>
+              <option value="mystery">Mystery Pack (500 Coins)</option>
+              <option value="ultra">Ultra Pack (1200 Coins)</option>
+              <option value="hype">Hype Pack (900 Coins)</option>
+              <option value="classic">Classic Pack (250 Coins)</option>
+              <option value="collab">Collab Pack (1500 Coins)</option>
+              <option value="seasonal">Seasonal Pack (600 Coins)</option>
+              <option value="newrarity">New Rarity Pack (3000 Coins)</option>
+            </select>
+            <select id="pack-multiplier" class="pack-select" style="width:auto;">
+              <option value="1">Open 1x</option>
+              <option value="3">Open 3x</option>
+              <option value="5">Open 5x</option>
+              <option value="10">Open 10x</option>
+            </select>
+            <button class="pack-button" onclick="openPackDropdown()">Open Pack</button>
+            <button class="pack-button" style="margin-left:8px;" onclick="previewPack()">Pack Preview</button>
+          </div>
+          <div class="upgrades">
+            <h2>Store Upgrades</h2>
+            <button class="pack-button" onclick="openUsedMarket()">Browse Used Sneakers</button>
+            <div class="resell-agent">
+              <h3>Resell Agents</h3>
+              <div class="agent-types" id="agent-types">
+                <!-- Agent types will be inserted here -->
+              </div>
+              <div class="agent-level">
+                Level: <div class="level-indicator" id="agent-level"></div>
+              </div>
+              <div class="agent-bonus" id="agent-bonus"></div>
+              <button class="pack-button" id="upgrade-agent-btn" onclick="upgradeResellAgent()">Upgrade Agent</button>
+            </div>
+            <div class="staff-section">
+              <h3>Automated Staff</h3>
+              <button class="pack-button" onclick="openHireStaff()">Hire Staff</button>
+              <div class="staff-grid" id="staff-grid">
+                <!-- Staff members will be inserted here -->
+              </div>
+            </div>
+          </div>
+          <div class="trading">
+            <h2>AI Trading System (Sneaker-for-Sneaker)</h2>
+            <button class="pack-button" onclick="openTradeUI()">Enter Trade</button>
+          </div>
+        <div class="modal" id="used-market-modal">
+          <div class="modal-header">
+            <h2>Used Sneaker Market</h2>
+            <button class="close-btn" onclick="closeUsedMarket()">Close</button>
+          </div>
+          <div class="used-market-grid" id="used-market-grid">
+            <!-- Used sneakers will be inserted here -->
+          </div>
         </div>
-        <div class="trade-arrow">↔️</div>
-        <div class="trade-side" id="ai-offer">
-          <h3>AI's Offer</h3>
-          <div class="offer-details"></div>
+        <div class="cleaning-game" id="cleaning-game">
+          <div class="modal-header">
+            <h2>Clean Your New Sneaker</h2>
+            <button class="close-btn" onclick="finishCleaning()">✕</button>
+          </div>
+          <div class="cleaning-info">
+            <p>Click on the dirt spots to clean them!</p>
+            <div class="condition-bar">
+              <div class="condition-fill" id="cleaning-progress"></div>
+            </div>
+          </div>
+          <canvas id="sneaker-canvas" class="sneaker-canvas" width="400" height="300"></canvas>
+          <button class="pack-button" onclick="finishCleaning()">Finish Cleaning</button>
+        </div>
+        <div class="modal" id="pack-modal">
+          <div id="modal-content">
+            <h2>Opening Pack...</h2>
+            <div id="card-container" class="card-container"></div>
+            <button id="next-sneaker-btn" onclick="revealNextSneaker()">Next Sneaker</button>
+          </div>
+        </div>
+        <div class="modal" id="trade-modal">
+          <div>
+            <h2>Select Trader</h2>
+            <div class="trader-selection" id="trader-selection">
+              <!-- Trader cards will be inserted here -->
+            </div>
+            <div id="ai-trader" class="ai-trader-info" style="display: none;">
+              <!-- AI trader info will be inserted here -->
+            </div>
+            <div class="trade-selection">
+              <div><b>Select sneakers to offer:</b></div>
+            <select id="trade-dropdown"></select>
+              <button class="pack-button" onclick="addToTrade()">Add to Trade</button>
+              <div id="selected-sneakers" class="selected-sneakers"></div>
+            </div>
+            <div class="trade-comparison">
+              <div class="trade-side" id="your-offer">
+                <h3>Your Offer</h3>
+                <div class="offer-details"></div>
+              </div>
+              <div class="trade-arrow">↔️</div>
+              <div class="trade-side" id="ai-offer">
+                <h3>AI's Offer</h3>
+                <div class="offer-details"></div>
+              </div>
+            </div>
+            <div id="ai-response" class="ai-response"></div>
+            <div class="negotiation-options" id="negotiation-options"></div>
+            <div id="trade-offer" class="trade-offer"></div>
+            <div id="trade-chat" class="trade-chat"></div>
+            <button class="close-btn" onclick="closeTradeUI()">Close</button>
+          </div>
+        </div>
+        <div class="modal" id="history-modal">
+          <div class="modal-header">
+            <h2>Purchase History</h2>
+            <button class="close-btn" onclick="closeHistory()">Close</button>
+          </div>
+          <div class="purchase-history" id="purchase-history">
+            <!-- Purchase history items will be added here -->
+          </div>
+        </div>
+        <div class="staff-hire-modal" id="staff-hire-modal">
+          <div class="modal-header">
+            <h2>Hire Staff</h2>
+            <button class="close-btn" onclick="closeHireStaff()">Close</button>
+          </div>
+          <div class="staff-hire-list" id="staff-hire-list">
+            <!-- Staff hire options will be inserted here -->
+          </div>
+        </div>
+        <div class="test-buttons">
+          <button class="test-button" onclick="showBreakingNews(true)">Test Breaking News</button>
         </div>
       </div>
-      <div id="ai-response" class="ai-response"></div>
-      <div class="negotiation-options" id="negotiation-options"></div>
-      <div id="trade-offer" class="trade-offer"></div>
-      <div id="trade-chat" class="trade-chat"></div>
-      <button class="close-btn" onclick="closeTradeUI()">Close</button>
-    </div>
-  </div>
-  <div class="modal" id="settings-modal">
-    <div class="modal-header">
-      <h2>Settings</h2>
-      <button class="close-btn" onclick="closeSettings()">Close</button>
-    </div>
-    <div class="settings-grid">
-      <div class="settings-item">
-        <label>
-          <input type="checkbox" id="animation-toggle" onclick="toggleAnimation()">
-          Show Animations
-        </label>
-      </div>
-      <div class="settings-item">
-        <label>
-          <input type="checkbox" id="notification-toggle" onclick="toggleNotifications()">
-          Show Notifications
-        </label>
-      </div>
-      <div class="settings-item">
-        <label for="display-mode">Display Mode</label>
-        <select id="display-mode" onchange="updateDisplayMode()">
-          <option value="grid">Grid View</option>
-          <option value="list">List View</option>
-          <option value="compact">Compact View</option>
-        </select>
-      </div>
-      <div class="settings-item">
-        <label for="currency-display">Currency Display</label>
-        <select id="currency-display" onchange="updateCurrencyDisplay()">
-          <option value="coins">Coins</option>
-          <option value="k">K Format (1K, 2K)</option>
-          <option value="full">Full Number</option>
-        </select>
-      </div>
-      <div class="settings-item">
-        <label for="sort-inventory">Default Sort</label>
-        <select id="sort-inventory" onchange="updateDefaultSort()">
-          <option value="rarity">By Rarity</option>
-          <option value="value">By Value</option>
-          <option value="brand">By Brand</option>
-          <option value="newest">Newest First</option>
-        </select>
-      </div>
-      <div class="settings-item">
-        <label>
-          <input type="checkbox" id="light-mode-toggle" onclick="toggleLightMode()">
-          Light Mode
-        </label>
-      </div>
-      <div class="settings-item">
-        <label><input type="checkbox" id="skip-animation-toggle" onclick="toggleSkipAnimation()"> Skip Pack Animation</label>
-      </div>
-    </div>
-  </div>
-  <div class="modal" id="history-modal">
-    <div class="modal-header">
-      <h2>Purchase History</h2>
-      <button class="close-btn" onclick="closeHistory()">Close</button>
-    </div>
-    <div class="purchase-history" id="purchase-history">
-      <!-- Purchase history items will be added here -->
-    </div>
-  </div>
-  <div class="staff-hire-modal" id="staff-hire-modal">
-    <div class="modal-header">
-      <h2>Hire Staff</h2>
-      <button class="close-btn" onclick="closeHireStaff()">Close</button>
-    </div>
-    <div class="staff-hire-list" id="staff-hire-list">
-      <!-- Staff hire options will be inserted here -->
-    </div>
-  </div>
-  <div class="test-buttons">
-    <button class="test-button" onclick="showBreakingNews(true)">Test Breaking News</button>
+    </main>
   </div>
   <script>
     // Initialize game state
@@ -1399,7 +1525,7 @@
 
     // Set default state for new games
     function setDefaultState() {
-      coins = 1000
+      coins = 10000000000
       inventory = [];
       purchaseHistory = [];
       settings = {
@@ -1421,7 +1547,7 @@
       hiredStaff = [];
       resellAgent.level = 0;
       resellAgent.baseUpgradeCost = 500;
-      resellAgent.bonusPerLevel = 0.2;
+      resellAgent.bonusPerLevel = 0.1; // Less extreme, always positive
       resellAgent.maxLevel = 5;
       storageUpgrades = 0;
       storageCost = 300;
@@ -1460,7 +1586,12 @@
     }
 
     function getNextPrestigeCost() {
-      return 100000 * (prestigeLevel + 1);
+      // First: 100k, then 300k, then 500k, then exponential
+      if (prestigeLevel === 0) return 100000;
+      if (prestigeLevel === 1) return 300000;
+      if (prestigeLevel === 2) return 500000;
+      // After third prestige, cost doubles each time
+      return 500000 * Math.pow(2, prestigeLevel - 2);
     }
 
     function prestigeNow() {
@@ -1474,7 +1605,7 @@
       hiredStaff = [];
       resellAgent.level = 0;
       resellAgent.baseUpgradeCost = 500;
-      resellAgent.bonusPerLevel = 0.2;
+      resellAgent.bonusPerLevel = 0.1; // Less extreme, always positive
       resellAgent.maxLevel = 5;
       storageUpgrades = 0;
       storageCost = 300;
@@ -1688,7 +1819,7 @@
 
     function revealNextSneaker() {
       const nextButton = document.getElementById("next-sneaker-btn");
-      nextButton.disabled = true;
+      if (nextButton) nextButton.style.display = 'none';
       
       if (currentSneakerIndex < currentSneakers.length) {
         const winningSneaker = currentSneakers[currentSneakerIndex];
@@ -1737,7 +1868,7 @@
         setTimeout(() => {
           currentSneakerIndex++;
           if (currentSneakerIndex < currentSneakers.length) {
-            nextButton.disabled = false;
+            revealNextSneaker();
           } else {
             finishPackOpening();
           }
@@ -2010,23 +2141,31 @@
     }
     function updateCoins() {
       const coinDisplay = document.getElementById('coin-count');
+      const coinSidebar = document.getElementById('coin-count-sidebar');
       if (coinDisplay) {
         let displayValue = coins;
         if (settings.currencyDisplay === 'k') {
-          displayValue = coins >= 1000 ? (coins/1000).toFixed(1) + 'K' : coins;
+          displayValue = coins >= 1000 ? Math.round(coins/1000) + 'K' : Math.round(coins);
         }
         coinDisplay.textContent = formatCurrency(displayValue);
+      }
+      if (coinSidebar) {
+        let displayValue = coins;
+        if (settings.currencyDisplay === 'k') {
+          displayValue = coins >= 1000 ? Math.round(coins/1000) + 'K' : Math.round(coins);
+        }
+        coinSidebar.textContent = formatCurrency(displayValue);
       }
       updatePrestigeDisplay();
     }
 
     function formatCurrency(amount) {
       if (settings.currencyDisplay === 'k' && amount >= 1000) {
-        return (amount/1000).toFixed(1) + 'K';
+        return Math.round(amount/1000) + 'K';
       } else if (settings.currencyDisplay === 'full') {
-        return amount.toLocaleString();
+        return Math.round(amount).toLocaleString();
       }
-      return amount.toString();
+      return Math.round(amount).toLocaleString();
     }
 
     function loadSettings() {
@@ -2299,7 +2438,7 @@
 
     function revealNextSneaker() {
       const nextButton = document.getElementById("next-sneaker-btn");
-      nextButton.disabled = true;
+      if (nextButton) nextButton.style.display = 'none';
       
       if (currentSneakerIndex < currentSneakers.length) {
         const winningSneaker = currentSneakers[currentSneakerIndex];
@@ -2348,7 +2487,7 @@
         setTimeout(() => {
           currentSneakerIndex++;
           if (currentSneakerIndex < currentSneakers.length) {
-            nextButton.disabled = false;
+            revealNextSneaker();
           } else {
             finishPackOpening();
           }
@@ -2620,13 +2759,19 @@
       // Decide multiplier
       let aiMultiplier = 0.6; // Default to underpay
       let overpay = 0;
-      if (hasRarityMatch) {
+      // For high-value trades, AI should never underpay and should often overpay
+      if (yourTotalValue >= 4000) {
+        aiMultiplier = 1.0 + Math.random() * 0.25; // Always fair or up to 25% overpay
+        if (hasRarityMatch || hasBrandMatch) aiMultiplier += 0.10; // Encourage overpay for good matches
+      } else if (hasRarityMatch) {
         overpay = 0.10 + Math.random() * 0.20; // 10-30% overpay
         if (hasBrandMatch) overpay += 0.10; // +10% if brand/model matches
         aiMultiplier = 1 + overpay;
       } else if (hasPriceMatch) {
         aiMultiplier = 1.0; // Fair if any price match
       }
+      // Never underpay for high-value trades
+      if (yourTotalValue >= 4000 && aiMultiplier < 1.0) aiMultiplier = 1.0;
 
       let targetTotalValue = yourTotalValue * adjustment * aiMultiplier;
 
@@ -3232,7 +3377,7 @@
       level: 0, // Start at level 0
       maxLevel: 5,
       baseUpgradeCost: 500,
-      bonusPerLevel: 0.2
+      bonusPerLevel: 0.1 // Less extreme, always positive
     };
 
     let storageUpgrades = 0;
@@ -3512,11 +3657,12 @@
       }
       
       coins -= staff.baseCost;
-      hiredStaff.push({
+      const newStaff = {
         ...staff,
         level: 1,
-        lastTradeTime: Date.now() // for auto trader
-      });
+        lastTradeTime: 0 // for autoBuyer, ensures immediate action
+      };
+      hiredStaff.push(newStaff);
       updateCoins();
       
       applyStaffBonuses();
@@ -3545,6 +3691,7 @@
       
       coins -= upgradeCost;
       staff.level++;
+      if (staff.id === 'autoBuyer') staff.lastTradeTime = 0; // ensure immediate action after upgrade
       updateCoins();
       
       applyStaffBonuses();
@@ -3584,34 +3731,31 @@
       const now = Date.now();
       if (!autoBuyer.lastTradeTime || now - autoBuyer.lastTradeTime >= 60000) {
         const tradesPerMinute = autoBuyer.level + 1;
-      for (let i = 0; i < tradesPerMinute; i++) {
-        // Try to buy a pack if we have enough coins
-        if (coins >= packTypes.standard.cost) {
-          const packKeys = Object.keys(packTypes);
-          const randomPack = packKeys[Math.floor(Math.random() * packKeys.length)];
-          const pack = packTypes[randomPack];
-          if (coins >= pack.cost) {
-            coins -= pack.cost;
-            const sneaker = rollSneaker(randomPack);
-            inventory.push(sneaker);
+        for (let i = 0; i < tradesPerMinute; i++) {
+          // Buy a random pack and immediately sell all sneakers
+          if (coins >= packTypes.standard.cost) {
+            const packKeys = Object.keys(packTypes);
+            const randomPack = packKeys[Math.floor(Math.random() * packKeys.length)];
+            const pack = packTypes[randomPack];
+            if (coins >= pack.cost) {
+              coins -= pack.cost;
+              // Each pack gives 3 sneakers
+              for (let j = 0; j < 3; j++) {
+                let sneaker = rollSneaker(randomPack);
+                // Immediately sell the sneaker for coins
+                let value = (typeof sneaker.dynamicValue === "number" && !isNaN(sneaker.dynamicValue)) ? sneaker.dynamicValue : sneaker.baseValue;
+                // Apply resell agent bonus
+                const bonus = 1 + (resellAgent.level * resellAgent.bonusPerLevel);
+                value = Math.floor(value * bonus);
+                coins += Math.floor(value * (1 + 0.10 * prestigeLevel));
+              }
             }
           }
         }
-        // After buying, try to trade to a random AI trader for coins (simulate a trade)
-        for (let i = 0; i < tradesPerMinute; i++) {
-          if (inventory.length > 0) {
-            const sneakerIdx = Math.floor(Math.random() * inventory.length);
-            const sneaker = inventory[sneakerIdx];
-            // Trade value improves with level
-            let tradeValue = sneaker.baseValue * (1 + 0.1 * autoBuyer.level);
-            coins += Math.floor(tradeValue * (1 + 0.10 * prestigeLevel));
-            inventory.splice(sneakerIdx, 1);
-          }
-        }
-      updateCoins();
-      updateInventory();
         autoBuyer.lastTradeTime = now;
-    }
+        updateCoins();
+        updateInventory();
+      }
     }
     setInterval(autoBuyerTick, 1000);
 
@@ -4499,6 +4643,29 @@
       document.getElementById("next-sneaker-btn").disabled = false;
       document.getElementById("next-sneaker-btn").style.display = '';
       revealNextSneaker();
+    }
+
+    function sellAllSneakers() {
+      if (inventory.length === 0) return;
+      let totalValue = 0;
+      inventory.forEach(sneaker => {
+        let value = (typeof sneaker.dynamicValue === "number" && !isNaN(sneaker.dynamicValue)) ? sneaker.dynamicValue : sneaker.baseValue;
+        // Apply any active event effects
+        activeEvents.forEach(event => {
+          if (event.sneaker === `${sneaker.brand} ${sneaker.model}`) {
+            value *= (1 + event.effect);
+          }
+        });
+        // Apply resell agent bonus
+        const bonus = 1 + (resellAgent.level * resellAgent.bonusPerLevel);
+        value = Math.floor(value * bonus);
+        totalValue += Math.floor(value * (1 + 0.10 * prestigeLevel));
+      });
+      coins += totalValue;
+      inventory = [];
+      updateCoins();
+      updateInventory();
+      showPurchaseNotification(`Sold all sneakers for ${formatCurrency(totalValue)} coins!`);
     }
   </script>
 </body>
