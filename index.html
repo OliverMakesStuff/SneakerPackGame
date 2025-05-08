@@ -15,9 +15,13 @@
     .inventory div, .market div, .trading div { background: #34495e; margin: 10px; padding: 10px; border-radius: 8px; }
     .sneaker-card { margin-bottom: 10px; }
     .rarity-common { color: #7f8c8d; }
+    .rarity-uncommon { color: #27ae60; }
     .rarity-rare { color: #2980b9; }
+    .rarity-ultra-rare { color: #16a085; }
     .rarity-epic { color: #8e44ad; }
+    .rarity-mythic { color: #e67e22; }
     .rarity-legendary { color: #f39c12; font-weight: bold; }
+    .rarity-grail { color: #e74c3c; font-weight: bold; text-shadow: 0 0 8px #fff; }
     .modal {
       position: fixed;
       top: 50%;
@@ -1042,8 +1046,11 @@
     .light-mode .rarity-common { color: #7f8c8d; }
     .light-mode .rarity-uncommon { color: #27ae60; }
     .light-mode .rarity-rare { color: #2980b9; }
+    .light-mode .rarity-ultra-rare { color: #16a085; }
     .light-mode .rarity-epic { color: #8e44ad; }
+    .light-mode .rarity-mythic { color: #e67e22; }
     .light-mode .rarity-legendary { color: #f39c12; }
+    .light-mode .rarity-grail { color: #e74c3c; }
 
     .light-mode .better-value { color: #27ae60; }
     .light-mode .worse-value { color: #e74c3c; }
@@ -1134,8 +1141,15 @@
         <option value="classic">Classic Pack (250 Coins)</option>
         <option value="collab">Collab Pack (1500 Coins)</option>
         <option value="seasonal">Seasonal Pack (600 Coins)</option>
+        <option value="newrarity">New Rarity Pack (3000 Coins)</option>
       </select>
-      <button class="pack-button" onclick="openPack()">Open Pack</button>
+      <select id="pack-multiplier" class="pack-select" style="width:auto;">
+        <option value="1">Open 1x</option>
+        <option value="3">Open 3x</option>
+        <option value="5">Open 5x</option>
+        <option value="10">Open 10x</option>
+      </select>
+      <button class="pack-button" onclick="openPackDropdown()">Open Pack</button>
       <button class="pack-button" style="margin-left:8px;" onclick="previewPack()">Pack Preview</button>
     </div>
     <div class="daily">
@@ -1166,6 +1180,7 @@
     </div>
     <div class="inventory">
       <h2>Your Inventory</h2>
+      <div id="inventory-total-value" style="font-size:18px;margin-bottom:8px;color:#f1c40f;"></div>
       <div id="inventory-list" class="inventory-list-flex"></div>
     </div>
     <div class="trading">
@@ -1343,65 +1358,40 @@
     // Initialize game state from save or defaults
     function initializeGame() {
       const savedState = localStorage.getItem('sneakerHustleGameState');
-      
+      console.log('[initializeGame] Loaded state from localStorage:', savedState);
       if (savedState) {
         try {
           const gameState = JSON.parse(savedState);
-          
-          // Restore basic values
           coins = gameState.coins ?? 10000;
           inventory = gameState.inventory || [];
           purchaseHistory = gameState.purchaseHistory || [];
-          
-          // Restore settings
-          if (gameState.settings) {
-            settings = {...settings, ...gameState.settings};
-          }
-          
-          // Restore market buyer
-          if (gameState.currentMarketBuyer) {
-            currentMarketBuyer = gameState.currentMarketBuyer;
-          }
-          
-          // Restore limited offers
-          if (gameState.limitedOffers) {
-            limitedOffers = new Map(gameState.limitedOffers);
-        }
-          
-          // Restore multipliers
+          if (gameState.settings) settings = { ...settings, ...gameState.settings };
+          if (gameState.currentMarketBuyer) currentMarketBuyer = gameState.currentMarketBuyer;
+          if (gameState.limitedOffers) limitedOffers = new Map(gameState.limitedOffers);
           if (gameState.activeMultipliers) {
             window.globalMultiplier = gameState.activeMultipliers.global;
             window.brandMultipliers = gameState.activeMultipliers.brand;
             window.coinMultiplier = gameState.activeMultipliers.coin;
           }
-          
-          // Restore trader state
           if (gameState.currentTrader) {
             window.currentTrader = gameState.currentTrader;
             window.lastTraderResponse = gameState.lastTraderResponse;
           }
-          if (gameState.hiredStaff) {
-            hiredStaff = gameState.hiredStaff;
+          if (gameState.hiredStaff) hiredStaff = gameState.hiredStaff;
+          // --- FIX: Only restore resellAgent.level if not already reset (i.e., not after prestige) ---
+          if (typeof resellAgent.level === 'number' && resellAgent.level === 0 && gameState.prestigeLevel !== undefined && prestigeLevel === gameState.prestigeLevel) {
+            if (gameState.resellAgentLevel !== undefined) resellAgent.level = gameState.resellAgentLevel;
           }
-          if (gameState.resellAgentLevel !== undefined) {
-            resellAgent.level = gameState.resellAgentLevel;
-          }
-          if (gameState.storageUpgrades !== undefined) {
-            storageUpgrades = gameState.storageUpgrades;
-          }
-          if (gameState.storageCost !== undefined) {
-            storageCost = gameState.storageCost;
-          }
+          if (gameState.storageUpgrades !== undefined) storageUpgrades = gameState.storageUpgrades;
+          if (gameState.storageCost !== undefined) storageCost = gameState.storageCost;
           if (gameState.prestigeLevel !== undefined) prestigeLevel = gameState.prestigeLevel;
         } catch (error) {
           console.error('Error loading game state:', error);
           setDefaultState();
         }
-        } else {
+      } else {
         setDefaultState();
       }
-      
-      // Update all UI elements
       updateAllDisplays();
       updateStorageDisplay();
       if (typeof updateStaffDisplay === 'function') updateStaffDisplay();
@@ -1430,6 +1420,9 @@
       };
       hiredStaff = [];
       resellAgent.level = 0;
+      resellAgent.baseUpgradeCost = 500;
+      resellAgent.bonusPerLevel = 0.2;
+      resellAgent.maxLevel = 5;
       storageUpgrades = 0;
       storageCost = 300;
       if (document.getElementById('storage-cost')) document.getElementById('storage-cost').textContent = storageCost;
@@ -1462,7 +1455,7 @@
       // Update info text with clear numbers
       const info = document.getElementById('prestige-next-info');
       if (info) {
-        info.textContent = `Coins: ${formatCurrency(coins)} / ${formatCurrency(nextCost)} for next prestige`;
+        info.textContent = `Prestige: ${prestigeLevel} | Coins: ${formatCurrency(coins)} / ${formatCurrency(nextCost)} for next prestige`;
       }
     }
 
@@ -1474,17 +1467,56 @@
       const nextCost = getNextPrestigeCost();
       if (coins < nextCost) return;
       prestigeLevel++;
+      // Reset all progress in-memory (do not rely on localStorage)
       coins = 0;
       inventory = [];
       purchaseHistory = [];
       hiredStaff = [];
       resellAgent.level = 0;
+      resellAgent.baseUpgradeCost = 500;
+      resellAgent.bonusPerLevel = 0.2;
+      resellAgent.maxLevel = 5;
       storageUpgrades = 0;
       storageCost = 300;
       clickCount = 0;
+      prestigeUpgrades = {
+        packDiscount: 0,
+        coinMultiplier: 0,
+        rareOdds: 0,
+        autoClickerBoost: 0
+      };
+      // --- FIX: Remove saved resellAgentLevel from localStorage on prestige ---
+      const savedState = localStorage.getItem('sneakerHustleGameState');
+      if (savedState) {
+        try {
+          const gameState = JSON.parse(savedState);
+          delete gameState.resellAgentLevel;
+          localStorage.setItem('sneakerHustleGameState', JSON.stringify(gameState));
+        } catch (e) {}
+      }
+      // --- FIX: Clear all staff effects and timers after prestige ---
+      applyStaffBonuses();
+      // Defensive: clear any lastTradeTime on autoBuyer if it exists
+      if (window.autoBuyer && window.autoBuyer.lastTradeTime) window.autoBuyer.lastTradeTime = 0;
+      // Force-clear UI for inventory, staff, and agent
+      if (document.getElementById('inventory-list')) document.getElementById('inventory-list').innerHTML = '';
+      if (document.getElementById('inventory-total-value')) document.getElementById('inventory-total-value').textContent = '';
+      if (document.getElementById('staff-grid')) document.getElementById('staff-grid').innerHTML = '';
+      if (document.getElementById('agent-level')) document.getElementById('agent-level').innerHTML = '';
       saveGameState();
       updateAllDisplays();
+      updatePackDropdown();
+      updateResellAgentDisplay();
+      if (typeof updateStaffDisplay === 'function') updateStaffDisplay();
       showPurchaseNotification('Prestiged! All bonuses increased.');
+      if (document.getElementById('agent-bonus')) document.getElementById('agent-bonus').textContent = '';
+      const upgradeBtn = document.getElementById('upgrade-agent-btn');
+      if (upgradeBtn) {
+        const nextCost = resellAgent.baseUpgradeCost; // Level 0 after prestige
+        upgradeBtn.textContent = `Upgrade Agent (${formatCurrency(nextCost)} coins)`;
+        upgradeBtn.disabled = false;
+      }
+      updateResellAgentDisplay();
     }
 
     // Save game state
@@ -1804,10 +1836,14 @@
     ];
 
     const rarities = [
-      { rarity: "common", weight: 60, value: [20, 50] },
-      { rarity: "rare", weight: 25, value: [60, 150] },
-      { rarity: "epic", weight: 12, value: [200, 400] },
-      { rarity: "legendary", weight: 3, value: [500, 2000] }
+      { rarity: "common", weight: 50, value: [10, 30] },
+      { rarity: "uncommon", weight: 30, value: [25, 60] },
+      { rarity: "rare", weight: 15, value: [50, 120] },
+      { rarity: "ultra-rare", weight: 7, value: [100, 250] },
+      { rarity: "epic", weight: 3, value: [200, 500] },
+      { rarity: "mythic", weight: 1, value: [400, 1200] },
+      { rarity: "legendary", weight: 0.4, value: [1000, 3000] },
+      { rarity: "grail", weight: 0.1, value: [2500, 7000] }
     ];
 
     // Instead of generating a fixed database, generate a random sneaker on demand
@@ -1835,67 +1871,72 @@
 
     // --- Pack Definitions ---
     const packTypes = {
-      standard: { 
+      standard: {
         cost: 100,
-        odds: { common: 0.75, rare: 0.20, epic: 0.04, legendary: 0.01 },
+        odds: { common: 0.60, uncommon: 0.22, rare: 0.10, 'ultra-rare': 0.04, epic: 0.025, mythic: 0.009, legendary: 0.005, grail: 0.001 },
         bg: '#222'
       },
-      premium: { 
+      premium: {
         cost: 300,
-        odds: { common: 0.45, rare: 0.35, epic: 0.15, legendary: 0.05 },
+        odds: { common: 0.30, uncommon: 0.25, rare: 0.18, 'ultra-rare': 0.10, epic: 0.07, mythic: 0.025, legendary: 0.015, grail: 0.005 },
         bg: '#2980b9'
       },
-      colorway: { 
+      colorway: {
         cost: 200,
-        odds: { common: 0.55, rare: 0.30, epic: 0.12, legendary: 0.03 }, 
+        odds: { common: 0.40, uncommon: 0.25, rare: 0.15, 'ultra-rare': 0.08, epic: 0.06, mythic: 0.02, legendary: 0.009, grail: 0.001 },
         colorway: true,
         bg: '#8e44ad'
       },
-      rare: { 
+      rare: {
         cost: 400,
-        odds: { rare: 0.70, epic: 0.25, legendary: 0.05 },
+        odds: { rare: 0.40, 'ultra-rare': 0.22, epic: 0.18, mythic: 0.08, legendary: 0.06, grail: 0.01, uncommon: 0.03, common: 0.02 },
         bg: '#16a085'
       },
-      epic: { 
+      epic: {
         cost: 700,
-        odds: { rare: 0.25, epic: 0.60, legendary: 0.15 },
+        odds: { epic: 0.40, mythic: 0.22, legendary: 0.18, grail: 0.04, 'ultra-rare': 0.10, rare: 0.04, uncommon: 0.01, common: 0.01 },
         bg: '#8e44ad'
       },
-      legendary: { 
+      legendary: {
         cost: 2500,
-        odds: { epic: 0.5, legendary: 0.5 },
+        odds: { legendary: 0.60, grail: 0.20, mythic: 0.10, epic: 0.07, 'ultra-rare': 0.02, rare: 0.01, uncommon: 0, common: 0 },
         bg: '#f39c12'
       },
-      mystery: { 
+      mystery: {
         cost: 500,
-        odds: { common: 0.25, rare: 0.35, epic: 0.30, legendary: 0.10 },
+        odds: { common: 0.20, uncommon: 0.18, rare: 0.18, 'ultra-rare': 0.12, epic: 0.10, mythic: 0.07, legendary: 0.04, grail: 0.01 },
         bg: '#34495e'
       },
-      ultra: { 
+      ultra: {
         cost: 1200,
-        odds: { rare: 0.10, epic: 0.60, legendary: 0.30 },
+        odds: { 'ultra-rare': 0.30, epic: 0.25, mythic: 0.18, legendary: 0.15, grail: 0.07, rare: 0.03, uncommon: 0.01, common: 0.01 },
         bg: '#e74c3c'
       },
-      hype: { 
+      hype: {
         cost: 900,
-        odds: { common: 0.10, rare: 0.30, epic: 0.40, legendary: 0.20 },
+        odds: { uncommon: 0.10, rare: 0.18, 'ultra-rare': 0.20, epic: 0.20, mythic: 0.12, legendary: 0.10, grail: 0.04, common: 0.06 },
         bg: '#27ae60'
       },
-      classic: { 
+      classic: {
         cost: 250,
-        odds: { common: 0.60, rare: 0.30, epic: 0.08, legendary: 0.02 },
+        odds: { common: 0.50, uncommon: 0.25, rare: 0.15, 'ultra-rare': 0.05, epic: 0.03, mythic: 0.01, legendary: 0.005, grail: 0.0005 },
         bg: '#bdc3c7'
       },
-      collab: { 
+      collab: {
         cost: 1500,
-        odds: { rare: 0.20, epic: 0.40, legendary: 0.40 },
+        odds: { rare: 0.10, 'ultra-rare': 0.18, epic: 0.25, mythic: 0.18, legendary: 0.18, grail: 0.08, uncommon: 0.01, common: 0.01 },
         colorway: true,
         bg: '#9b59b6'
       },
-      seasonal: { 
+      seasonal: {
         cost: 600,
-        odds: { common: 0.30, rare: 0.40, epic: 0.25, legendary: 0.05 },
+        odds: { common: 0.20, uncommon: 0.20, rare: 0.18, 'ultra-rare': 0.12, epic: 0.10, mythic: 0.08, legendary: 0.06, grail: 0.02 },
         bg: '#f1c40f'
+      },
+      newrarity: {
+        cost: 3000,
+        odds: { 'ultra-rare': 0.20, epic: 0.20, mythic: 0.20, legendary: 0.20, grail: 0.15, rare: 0.03, uncommon: 0.01, common: 0.01 },
+        bg: 'linear-gradient(90deg, #e67e22, #e74c3c, #8e44ad, #f39c12)'
       }
     };
 
@@ -1906,11 +1947,21 @@
 
     function updateInventory() {
       const inventoryDiv = document.getElementById("inventory-list");
+      const totalValueDiv = document.getElementById("inventory-total-value");
       inventoryDiv.innerHTML = '';
       if (inventory.length === 0) {
         inventoryDiv.innerHTML = "<em>No sneakers in inventory.</em>";
+        if (totalValueDiv) totalValueDiv.textContent = '';
         return;
       }
+
+      // Calculate total value
+      let totalValue = 0;
+      inventory.forEach(sneaker => {
+        let value = (typeof sneaker.dynamicValue === "number" && !isNaN(sneaker.dynamicValue)) ? sneaker.dynamicValue : sneaker.baseValue;
+        totalValue += value;
+      });
+      if (totalValueDiv) totalValueDiv.textContent = `Total Inventory Value: ${formatCurrency(Math.floor(totalValue))} coins`;
 
       // Sort inventory based on settings
       const sortedInventory = [...inventory].sort((a, b) => {
@@ -2123,11 +2174,11 @@
       let odds = {...pack.odds};
       if (prestigeLevel > 0) {
         let bonus = 0.05 * prestigeLevel;
-        if (odds.rare) odds.rare += bonus;
-        if (odds.epic) odds.epic += bonus;
-        if (odds.legendary) odds.legendary += bonus;
-        // Subtract total bonus from common
-        if (odds.common) odds.common = Math.max(0, odds.common - bonus * 3);
+        // Apply bonus to all rarities except common
+        Object.keys(odds).forEach(key => {
+          if (key !== 'common') odds[key] += bonus;
+        });
+        if (odds.common) odds.common = Math.max(0, odds.common - bonus * (Object.keys(odds).length - 1));
         // Normalize if total > 1
         let total = Object.values(odds).reduce((a, b) => a + b, 0);
         if (total > 1) {
@@ -2136,7 +2187,9 @@
       }
       let rarity = "common";
       let sum = 0;
-      for (let key of ["common", "rare", "epic", "legendary"]) {
+      // Use all rarity keys in odds, in the order of the rarities array for consistency
+      for (let r of rarities) {
+        const key = r.rarity;
         if (odds[key]) {
           sum += odds[key];
           if (roll < sum) {
@@ -2531,93 +2584,78 @@
 
       const yourSneakers = selectedTradeItems.map(index => inventory[index]);
       const yourTotalValue = yourSneakers.reduce((sum, s) => {
-        return sum + ((typeof s.dynamicValue === "number" && !isNaN(s.dynamicValue)) ? 
-          s.dynamicValue : s.baseValue);
+        return sum + ((typeof s.dynamicValue === "number" && !isNaN(s.dynamicValue)) ? s.dynamicValue : s.baseValue);
       }, 0);
 
-      // Calculate target value based on trader preferences
-      let targetTotalValue = yourTotalValue * adjustment;
-      
-      // Adjust value based on how many preferred items are being offered
-      const preferredCount = yourSneakers.filter(s => 
-        currentTrader.preferences.some(pref => 
-          s.brand.includes(pref) || 
-          s.rarity.toLowerCase() === pref.toLowerCase()
-        )
-      ).length;
-      
-      // Bonus for preferred items
-      if (preferredCount > 0) {
-        targetTotalValue *= (1 + (preferredCount * 0.15)); // 15% bonus per preferred item
-      }
-
-      // Apply trader value preference
-      let valueMultiplier = 1.0;
+      // Universal: determine desired rarity and price range for this trader
+      let desiredRarities = [];
       switch(currentTrader.valuePreference) {
-        case 'low':
-          valueMultiplier = 0.8;
-          break;
-        case 'medium':
-          valueMultiplier = 1.0;
-          break;
         case 'high':
-          valueMultiplier = 1.2;
+          desiredRarities = ['legendary'];
           break;
         case 'ultra':
-          valueMultiplier = 1.5;
+          desiredRarities = ['legendary', 'epic'];
+          break;
+        case 'medium':
+          desiredRarities = ['epic', 'rare'];
+          break;
+        case 'low':
+        default:
+          desiredRarities = ['common'];
           break;
       }
-      targetTotalValue = yourTotalValue * adjustment * valueMultiplier;
+      const minValue = currentTrader.additionalPreferences?.minValue ?? 0;
+      const maxValue = currentTrader.additionalPreferences?.maxValue ?? Infinity;
 
-      // Generate AI offer
-      aiTradeOffer = [];
-      
-      // Get preferred sneakers that match trader's style and preferences
-      const preferredSneakers = sneakersDatabase.filter(s => {
-        const matchesPreference = currentTrader.preferences.some(pref => 
-          s.brand.includes(pref) || 
-          s.rarity.toLowerCase() === pref.toLowerCase()
-        );
-        
-        // Style matching
-        const matchesStyle = (
-          (currentTrader.style === 'hype' && (s.rarity === 'legendary' || s.rarity === 'epic')) ||
-          (currentTrader.style === 'budget' && (s.rarity === 'common' || s.rarity === 'rare')) ||
-          (currentTrader.style === 'luxury' && s.rarity === 'legendary') ||
-          (currentTrader.style === 'classic' && s.brand === 'Nike' || s.brand === 'Jordan')
-        );
-        
-        return matchesPreference || matchesStyle;
+      // Check for any rarity or price match
+      let hasRarityMatch = false;
+      let hasPriceMatch = false;
+      yourSneakers.forEach(s => {
+        if (desiredRarities.includes(s.rarity)) hasRarityMatch = true;
+        if (s.baseValue >= minValue && s.baseValue <= maxValue) hasPriceMatch = true;
       });
 
-      // Try to offer preferred sneakers first
-      while (aiTradeOffer.length < 3 && preferredSneakers.length > 0 && targetTotalValue > 0) {
-        const index = Math.floor(Math.random() * preferredSneakers.length);
-        const sneaker = preferredSneakers[index];
-        
+      // Decide multiplier
+      let aiMultiplier = 0.6; // Default to underpay
+      if (hasRarityMatch) aiMultiplier = 1.4; // Overpay if any rarity match
+      else if (hasPriceMatch) aiMultiplier = 1.0; // Fair if any price match
+
+      let targetTotalValue = yourTotalValue * adjustment * aiMultiplier;
+
+      // Generate AI offer pool based on multiplier
+      aiTradeOffer = [];
+      let offerPool = [];
+      if (aiMultiplier === 1.4) {
+        // Overpay: offer sneakers matching only rarity
+        offerPool = sneakersDatabase.filter(s => desiredRarities.includes(s.rarity));
+      } else if (aiMultiplier === 1.0) {
+        // Fair: offer sneakers matching only price
+        offerPool = sneakersDatabase.filter(s => s.baseValue >= minValue && s.baseValue <= maxValue);
+      } else {
+        // Underpay: offer anything affordable
+        offerPool = sneakersDatabase;
+      }
+      while (aiTradeOffer.length < 3 && offerPool.length > 0 && targetTotalValue > 0) {
+        const index = Math.floor(Math.random() * offerPool.length);
+        const sneaker = offerPool[index];
         if (sneaker.baseValue <= targetTotalValue) {
           aiTradeOffer.push({...sneaker, id: Date.now() + Math.random()});
           targetTotalValue -= sneaker.baseValue;
-          preferredSneakers.splice(index, 1);
+          offerPool.splice(index, 1);
         } else {
           break;
         }
       }
-
       // Fill remaining slots with any affordable sneakers
       while (aiTradeOffer.length < 3 && targetTotalValue > 0) {
         const affordable = sneakersDatabase.filter(s => s.baseValue <= targetTotalValue);
         if (affordable.length === 0) break;
-        
         const sneaker = affordable[Math.floor(Math.random() * affordable.length)];
         aiTradeOffer.push({...sneaker, id: Date.now() + Math.random()});
         targetTotalValue -= sneaker.baseValue;
       }
-
       updateTradeComparison();
       updateNegotiationOptions();
-      
-      // Add accept trade button if there's an offer
       const tradeOffer = document.getElementById("trade-offer");
       if (tradeOffer) {
         if (aiTradeOffer.length > 0) {
@@ -2916,28 +2954,31 @@
       const levelDiv = document.getElementById('agent-level');
       const bonusDiv = document.getElementById('agent-bonus');
       const upgradeBtn = document.getElementById('upgrade-agent-btn');
-      
       if (levelDiv) {
         levelDiv.innerHTML = Array(resellAgent.level)
           .fill('⭐')
           .concat(Array(resellAgent.maxLevel - resellAgent.level).fill('☆'))
           .join('');
       }
-      
       if (bonusDiv) {
         const bonus = (resellAgent.level * resellAgent.bonusPerLevel * 100).toFixed(0);
         bonusDiv.textContent = `Current Bonus: +${bonus}% sale value`;
       }
-      
       if (upgradeBtn) {
         if (resellAgent.level >= resellAgent.maxLevel) {
           upgradeBtn.textContent = 'Max Level Reached!';
-          upgradeBtn.disabled = true;
+          upgradeBtn.disabled = false; // Keep clickable
         } else {
           const nextCost = resellAgent.baseUpgradeCost * Math.pow(2, resellAgent.level - 1);
           upgradeBtn.textContent = `Upgrade Agent (${formatCurrency(nextCost)} coins)`;
           upgradeBtn.disabled = false;
         }
+      }
+      // --- DEFENSIVE FIX: Always enable the button after prestige if level is 0 ---
+      if (upgradeBtn && resellAgent.level === 0) {
+        upgradeBtn.disabled = false;
+        const nextCost = resellAgent.baseUpgradeCost;
+        upgradeBtn.textContent = `Upgrade Agent (${formatCurrency(nextCost)} coins)`;
       }
     }
 
@@ -4332,6 +4373,123 @@
       var prestigeBtn = document.getElementById('prestige-btn');
       if (prestigeBtn) prestigeBtn.onclick = prestigeNow;
     });
+
+    const allRarities = ["common", "uncommon", "rare", "ultra-rare", "epic", "mythic", "legendary", "grail"];
+    Object.keys(packTypes).forEach(packKey => {
+      const odds = packTypes[packKey].odds;
+      // Ensure all rarities are present
+      let total = 0;
+      allRarities.forEach(r => {
+        if (!odds[r]) odds[r] = 0.0001; // Give a tiny chance if missing
+        total += odds[r];
+      });
+      // Normalize odds to sum to 1
+      allRarities.forEach(r => {
+        odds[r] = odds[r] / total;
+      });
+      // Reorder odds keys to match allRarities order (for display/debug)
+      const newOdds = {};
+      allRarities.forEaca(r => { newOdds[r] = odds[r]; });
+      packTypes[packKey].odds = newOdds;
+    });
+
+    // --- Add openMultiplePacks function ---
+    function openMultiplePacks(count) {
+      const type = document.getElementById("pack-type").value;
+      let pack = { ...packTypes[type] };
+      pack.cost = getDiscountedPackPrice(type);
+      const totalCost = pack.cost * count;
+      if (coins < totalCost) {
+        showPurchaseNotification("Not enough coins!", "error");
+        return;
+      }
+      coins -= totalCost;
+      updateCoins();
+      // Disable buttons during pack opening
+      document.querySelectorAll('.pack-button, .pack-select').forEach(btn => {
+        btn.disabled = true;
+      });
+      // Show the modal
+      const packModal = document.getElementById("pack-modal");
+      const modalOverlay = document.getElementById("modal-overlay");
+      packModal.classList.add('show');
+      modalOverlay.classList.add('show');
+      // Generate sneakers
+      let allSneakers = [];
+      for (let i = 0; i < count; i++) {
+        for (let j = 0; j < 3; j++) {
+          let sneaker = rollSneaker(type);
+          allSneakers.push(sneaker);
+        }
+      }
+      // Record the purchase
+      addPurchaseToHistory(`${count}x Pack Opening`, totalCost, allSneakers);
+      // Show all sneakers in the modal as a grid
+      const cardContainer = document.getElementById("card-container");
+      cardContainer.innerHTML = `<div style='display:flex;flex-wrap:wrap;justify-content:center;gap:12px;'>${allSneakers.map(s => `
+        <div class='sneaker-card' style='background:#34495e;padding:10px;border-radius:8px;min-width:120px;max-width:140px;'>
+          <img src='${s.image}' alt='${s.brand} ${s.model}' style='width:60px;height:60px;object-fit:contain;display:block;margin:0 auto 8px auto;' />
+          <strong>${s.brand} ${s.model}</strong><br>
+          <span>${s.colorway}</span><br>
+          <span class='rarity-${s.rarity}'>[${s.rarity.toUpperCase()}]</span>
+        </div>
+      `).join('')}</div>`;
+      // Hide next sneaker button
+      document.getElementById("next-sneaker-btn").style.display = 'none';
+      // Add all sneakers to inventory after a short delay
+      setTimeout(() => {
+        inventory.push(...allSneakers);
+        updateInventory();
+        // Close the modal after a few seconds
+        setTimeout(() => {
+          packModal.classList.remove('show');
+          modalOverlay.classList.remove('show');
+          cardContainer.innerHTML = "";
+          document.querySelectorAll('.pack-button, .pack-select').forEach(btn => {
+            btn.disabled = false;
+          });
+          document.getElementById("next-sneaker-btn").style.display = '';
+        }, 2500 + Math.min(2000, allSneakers.length * 100));
+      }, 800);
+    }
+
+    // --- Add openPackDropdown function ---
+    function openPackDropdown() {
+      const count = parseInt(document.getElementById('pack-multiplier').value, 10);
+      const type = document.getElementById("pack-type").value;
+      let pack = { ...packTypes[type] };
+      pack.cost = getDiscountedPackPrice(type);
+      const totalCost = pack.cost * count;
+      if (coins < totalCost) {
+        showPurchaseNotification("Not enough coins!", "error");
+        return;
+      }
+      coins -= totalCost;
+      updateCoins();
+      // Disable buttons during pack opening
+      document.querySelectorAll('.pack-button, .pack-select').forEach(btn => {
+        btn.disabled = true;
+      });
+      // Show the modal
+      const packModal = document.getElementById("pack-modal");
+      const modalOverlay = document.getElementById("modal-overlay");
+      packModal.classList.add('show');
+      modalOverlay.classList.add('show');
+      // Generate sneakers (3 per pack)
+      currentSneakers = [];
+      for (let i = 0; i < count * 3; i++) {
+        let sneaker = rollSneaker(type);
+        currentSneakers.push(sneaker);
+      }
+      // Record the purchase (will be added to inventory at the end)
+      addPurchaseToHistory(`${count}x Pack Opening`, totalCost, currentSneakers);
+      // Reset state and start reveal
+      currentSneakerIndex = 0;
+      document.getElementById("card-container").innerHTML = "";
+      document.getElementById("next-sneaker-btn").disabled = false;
+      document.getElementById("next-sneaker-btn").style.display = '';
+      revealNextSneaker();
+    }
   </script>
 </body>
 </html>
