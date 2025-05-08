@@ -2587,47 +2587,55 @@
         return sum + ((typeof s.dynamicValue === "number" && !isNaN(s.dynamicValue)) ? s.dynamicValue : s.baseValue);
       }, 0);
 
-      // Universal: determine desired rarity and price range for this trader
+      // Determine desired rarity and price range for this trader
       let desiredRarities = [];
       switch(currentTrader.valuePreference) {
         case 'high':
-          desiredRarities = ['legendary'];
+          desiredRarities = ['legendary', 'grail', 'mythic'];
           break;
         case 'ultra':
-          desiredRarities = ['legendary', 'epic'];
+          desiredRarities = ['legendary', 'epic', 'grail', 'mythic'];
           break;
         case 'medium':
-          desiredRarities = ['epic', 'rare'];
+          desiredRarities = ['epic', 'rare', 'ultra-rare'];
           break;
         case 'low':
         default:
-          desiredRarities = ['common'];
+          desiredRarities = ['common', 'uncommon'];
           break;
       }
       const minValue = currentTrader.additionalPreferences?.minValue ?? 0;
       const maxValue = currentTrader.additionalPreferences?.maxValue ?? Infinity;
 
-      // Check for any rarity or price match
+      // Check for strong match: rarity/value AND brand/model
       let hasRarityMatch = false;
       let hasPriceMatch = false;
+      let hasBrandMatch = false;
       yourSneakers.forEach(s => {
         if (desiredRarities.includes(s.rarity)) hasRarityMatch = true;
         if (s.baseValue >= minValue && s.baseValue <= maxValue) hasPriceMatch = true;
+        if (currentTrader.preferences.some(pref => s.brand.includes(pref) || s.model?.includes(pref))) hasBrandMatch = true;
       });
 
       // Decide multiplier
       let aiMultiplier = 0.6; // Default to underpay
-      if (hasRarityMatch) aiMultiplier = 1.4; // Overpay if any rarity match
-      else if (hasPriceMatch) aiMultiplier = 1.0; // Fair if any price match
+      let overpay = 0;
+      if (hasRarityMatch) {
+        overpay = 0.10 + Math.random() * 0.20; // 10-30% overpay
+        if (hasBrandMatch) overpay += 0.10; // +10% if brand/model matches
+        aiMultiplier = 1 + overpay;
+      } else if (hasPriceMatch) {
+        aiMultiplier = 1.0; // Fair if any price match
+      }
 
       let targetTotalValue = yourTotalValue * adjustment * aiMultiplier;
 
       // Generate AI offer pool based on multiplier
       aiTradeOffer = [];
       let offerPool = [];
-      if (aiMultiplier === 1.4) {
-        // Overpay: offer sneakers matching only rarity
-        offerPool = sneakersDatabase.filter(s => desiredRarities.includes(s.rarity));
+      if (aiMultiplier > 1.01) {
+        // Overpay: offer sneakers matching rarity and/or brand/model
+        offerPool = sneakersDatabase.filter(s => desiredRarities.includes(s.rarity) || currentTrader.preferences.some(pref => s.brand.includes(pref) || s.model?.includes(pref)));
       } else if (aiMultiplier === 1.0) {
         // Fair: offer sneakers matching only price
         offerPool = sneakersDatabase.filter(s => s.baseValue >= minValue && s.baseValue <= maxValue);
@@ -2635,15 +2643,17 @@
         // Underpay: offer anything affordable
         offerPool = sneakersDatabase;
       }
+      // Sort offerPool by value descending for more realistic overpay
+      offerPool = offerPool.sort((a, b) => b.baseValue - a.baseValue);
       while (aiTradeOffer.length < 3 && offerPool.length > 0 && targetTotalValue > 0) {
-        const index = Math.floor(Math.random() * offerPool.length);
+        const index = Math.floor(Math.random() * Math.min(offerPool.length, 10)); // bias toward higher value
         const sneaker = offerPool[index];
         if (sneaker.baseValue <= targetTotalValue) {
           aiTradeOffer.push({...sneaker, id: Date.now() + Math.random()});
           targetTotalValue -= sneaker.baseValue;
           offerPool.splice(index, 1);
         } else {
-          break;
+          offerPool.splice(index, 1);
         }
       }
       // Fill remaining slots with any affordable sneakers
