@@ -3795,7 +3795,7 @@
       if (!autoBuyer.lastTradeTime || now - autoBuyer.lastTradeTime >= 60000) {
         const tradesPerMinute = autoBuyer.level + 1;
         for (let i = 0; i < tradesPerMinute; i++) {
-          // Buy a random pack and immediately sell all sneakers
+          // Buy a random pack and immediately sell only the sneakers just bought
           if (coins >= packTypes.standard.cost) {
             const packKeys = Object.keys(packTypes);
             const randomPack = packKeys[Math.floor(Math.random() * packKeys.length)];
@@ -3803,14 +3803,20 @@
             if (coins >= pack.cost) {
               coins -= pack.cost;
               // Each pack gives 3 sneakers
+              let justBought = [];
               for (let j = 0; j < 3; j++) {
                 let sneaker = rollSneaker(randomPack);
-                // Immediately sell the sneaker for coins
-                let value = (typeof sneaker.dynamicValue === "number" && !isNaN(sneaker.dynamicValue)) ? sneaker.dynamicValue : sneaker.baseValue;
-                // Apply resell agent bonus
-                const bonus = 1 + (resellAgent.level * resellAgent.bonusPerLevel);
-                value = Math.floor(value * bonus);
-                coins += Math.floor(value * (1 + 0.10 * prestigeLevel));
+                sneaker.id = Date.now() + Math.random(); // Ensure unique id
+                inventory.push(sneaker);
+                justBought.push(sneaker);
+              }
+              // Immediately sell only the just bought sneakers
+              for (const sneaker of justBought) {
+                // Find the index by id (in case inventory changed)
+                const idx = inventory.findIndex(s => s.id === sneaker.id);
+                if (idx !== -1) {
+                  sellSneaker(idx);
+                }
               }
             }
           }
