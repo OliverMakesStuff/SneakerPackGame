@@ -1334,6 +1334,7 @@
               <option value="3">Open 3x</option>
               <option value="5">Open 5x</option>
               <option value="10">Open 10x</option>
+              <option value="100">Open 100x</option>
             </select>
             <button class="pack-button" onclick="openPackDropdown()">Open Pack</button>
             <button class="pack-button" style="margin-left:8px;" onclick="previewPack()">Pack Preview</button>
@@ -1877,6 +1878,8 @@
     }
 
     function finishPackOpening() {
+      // Autolock grails before adding to inventory
+      currentSneakers.forEach(s => { if (s.rarity === 'grail') s.locked = true; });
       inventory.push(...currentSneakers);
       updateInventory();
       
@@ -4693,6 +4696,24 @@
       document.querySelectorAll('.pack-button, .pack-select').forEach(btn => {
         btn.disabled = true;
       });
+      if (count === 100) {
+        // Skip animation, instantly add all sneakers to inventory
+        let allSneakers = [];
+        for (let i = 0; i < count * 3; i++) {
+          let sneaker = rollSneaker(type);
+          if (sneaker.rarity === 'grail') sneaker.locked = true;
+          allSneakers.push(sneaker);
+        }
+        inventory.push(...allSneakers);
+        addPurchaseToHistory(`100x Pack Opening`, totalCost, allSneakers);
+        updateInventory();
+        showPurchaseNotification("Opened 100 packs! 300 sneakers added to inventory.");
+        // Re-enable buttons
+        document.querySelectorAll('.pack-button, .pack-select').forEach(btn => {
+          btn.disabled = false;
+        });
+        return;
+      }
       // Show the modal
       const packModal = document.getElementById("pack-modal");
       const modalOverlay = document.getElementById("modal-overlay");
