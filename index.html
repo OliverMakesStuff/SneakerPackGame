@@ -1888,7 +1888,11 @@
       
       // Reset state
       document.getElementById("card-container").innerHTML = "";
-      document.getElementById("next-sneaker-btn").disabled = false;
+      const nextBtn = document.getElementById("next-sneaker-btn");
+      if (nextBtn) {
+        nextBtn.disabled = false;
+        nextBtn.style.display = '';
+      }
       currentSneakerIndex = 0;
       currentSneakers = [];
       
@@ -4640,8 +4644,11 @@
       // Reset state and start reveal
       currentSneakerIndex = 0;
       document.getElementById("card-container").innerHTML = "";
-      document.getElementById("next-sneaker-btn").disabled = false;
-      document.getElementById("next-sneaker-btn").style.display = '';
+      const nextBtn = document.getElementById("next-sneaker-btn");
+      if (nextBtn) {
+        nextBtn.disabled = false;
+        nextBtn.style.display = '';
+      }
       revealNextSneaker();
     }
 
@@ -4667,6 +4674,59 @@
       updateInventory();
       showPurchaseNotification(`Sold all sneakers for ${formatCurrency(totalValue)} coins!`);
     }
+
+    // --- While you were away function ---
+    window.addEventListener('load', function() {
+      try {
+        const lastVisit = parseInt(localStorage.getItem('lastVisitTimestamp'), 10);
+        const now = Date.now();
+        if (lastVisit && now > lastVisit) {
+          let coinsGained = 0;
+          // Estimate autoClicker gains
+          if (typeof autoClickerRate === 'number' && autoClickerRate > 0) {
+            const secondsAway = Math.floor((now - lastVisit) / 1000);
+            coinsGained += autoClickerRate * secondsAway * (1 + 0.10 * prestigeLevel);
+          }
+          // Estimate autoBuyer gains
+          const autoBuyer = hiredStaff && hiredStaff.find(s => s.id === 'autoBuyer');
+          if (autoBuyer) {
+            const minutesAway = Math.floor((now - lastVisit) / 60000);
+            const tradesPerMinute = autoBuyer.level + 1;
+            let perPackCoins = 0;
+            // Simulate average pack opening and selling
+            const packKeys = Object.keys(packTypes);
+            for (let t = 0; t < tradesPerMinute; t++) {
+              // Use standard pack for estimate
+              const pack = packTypes['standard'];
+              for (let j = 0; j < 3; j++) {
+                // Use average value for standard pack
+                let avgValue = 0;
+                for (const rarity in pack.odds) {
+                  const odds = pack.odds[rarity];
+                  const rarityObj = rarities.find(r => r.rarity === rarity);
+                  if (rarityObj) {
+                    avgValue += odds * ((rarityObj.value[0] + rarityObj.value[1]) / 2);
+                  }
+                }
+                // Apply resell agent bonus
+                const bonus = 1 + (resellAgent.level * resellAgent.bonusPerLevel);
+                avgValue = Math.floor(avgValue * bonus);
+                perPackCoins += Math.floor(avgValue * (1 + 0.10 * prestigeLevel));
+              }
+            }
+            coinsGained += perPackCoins * minutesAway;
+          }
+          if (coinsGained > 0) {
+            coins += Math.floor(coinsGained);
+            updateCoins();
+            showPurchaseNotification(`While you were away, you gained ${formatCurrency(Math.floor(coinsGained))} coins!`);
+          }
+        }
+      } catch (e) { /* ignore */ }
+    });
+    window.addEventListener('beforeunload', function() {
+      localStorage.setItem('lastVisitTimestamp', Date.now().toString());
+    });
   </script>
 </body>
 </html>
