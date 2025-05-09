@@ -2730,6 +2730,10 @@
         return sum + ((typeof s.dynamicValue === "number" && !isNaN(s.dynamicValue)) ? s.dynamicValue : s.baseValue);
       }, 0);
 
+      // --- GRAIL TRADE LOGIC ---
+      const playerHasGrail = yourSneakers.some(s => s.rarity === 'grail');
+      const aiHighValue = currentTrader.valuePreference === 'high' || currentTrader.valuePreference === 'ultra';
+
       // Determine desired rarity and price range for this trader
       let desiredRarities = [];
       switch(currentTrader.valuePreference) {
@@ -2779,39 +2783,81 @@
 
       let targetTotalValue = yourTotalValue * adjustment * aiMultiplier;
 
-      // Generate AI offer pool based on multiplier
+      // --- GRAIL TRADE ENFORCEMENT ---
       aiTradeOffer = [];
       let offerPool = [];
-      if (aiMultiplier > 1.01) {
-        // Overpay: offer sneakers matching rarity and/or brand/model
-        offerPool = sneakersDatabase.filter(s => desiredRarities.includes(s.rarity) || currentTrader.preferences.some(pref => s.brand.includes(pref) || s.model?.includes(pref)));
-      } else if (aiMultiplier === 1.0) {
-        // Fair: offer sneakers matching only price
-        offerPool = sneakersDatabase.filter(s => s.baseValue >= minValue && s.baseValue <= maxValue);
-      } else {
-        // Underpay: offer anything affordable
-        offerPool = sneakersDatabase;
-      }
-      // Sort offerPool by value descending for more realistic overpay
-      offerPool = offerPool.sort((a, b) => b.baseValue - a.baseValue);
-      while (aiTradeOffer.length < 3 && offerPool.length > 0 && targetTotalValue > 0) {
-        const index = Math.floor(Math.random() * Math.min(offerPool.length, 10)); // bias toward higher value
-        const sneaker = offerPool[index];
-        if (sneaker.baseValue <= targetTotalValue) {
-          aiTradeOffer.push({...sneaker, id: Date.now() + Math.random()});
-          targetTotalValue -= sneaker.baseValue;
-          offerPool.splice(index, 1);
-        } else {
-          offerPool.splice(index, 1);
+      if (playerHasGrail && aiHighValue) {
+        // AI must overpay and must offer at least one grail
+        offerPool = sneakersDatabase.filter(s => s.rarity === 'grail');
+        // If not enough grails, fill with next highest rarities
+        if (offerPool.length === 0) {
+          offerPool = sneakersDatabase.filter(s => ['legendary', 'mythic', 'epic'].includes(s.rarity));
         }
-      }
-      // Fill remaining slots with any affordable sneakers
-      while (aiTradeOffer.length < 3 && targetTotalValue > 0) {
-        const affordable = sneakersDatabase.filter(s => s.baseValue <= targetTotalValue);
-        if (affordable.length === 0) break;
-        const sneaker = affordable[Math.floor(Math.random() * affordable.length)];
-        aiTradeOffer.push({...sneaker, id: Date.now() + Math.random()});
-        targetTotalValue -= sneaker.baseValue;
+        // Sort by value descending
+        offerPool = offerPool.sort((a, b) => b.baseValue - a.baseValue);
+        // Always try to include at least one grail if possible
+        let grailAdded = false;
+        for (let i = 0; i < offerPool.length && aiTradeOffer.length < 3 && targetTotalValue > 0; i++) {
+          const sneaker = offerPool[i];
+          if (!grailAdded && sneaker.rarity === 'grail') {
+            aiTradeOffer.push({ ...sneaker, id: Date.now() + Math.random() });
+            targetTotalValue -= sneaker.baseValue;
+            grailAdded = true;
+          } else if (grailAdded && sneaker.baseValue <= targetTotalValue) {
+            aiTradeOffer.push({ ...sneaker, id: Date.now() + Math.random() });
+            targetTotalValue -= sneaker.baseValue;
+          }
+        }
+        // If less than 3, fill with any high value sneakers
+        if (aiTradeOffer.length < 3) {
+          let fillPool = sneakersDatabase.filter(s => s.baseValue <= targetTotalValue && s.rarity !== 'common' && s.rarity !== 'uncommon');
+          fillPool = fillPool.sort((a, b) => b.baseValue - a.baseValue);
+          for (let i = 0; i < fillPool.length && aiTradeOffer.length < 3 && targetTotalValue > 0; i++) {
+            aiTradeOffer.push({ ...fillPool[i], id: Date.now() + Math.random() });
+            targetTotalValue -= fillPool[i].baseValue;
+          }
+        }
+        // Defensive: if still not enough, fill with anything affordable
+        while (aiTradeOffer.length < 3 && targetTotalValue > 0) {
+          const affordable = sneakersDatabase.filter(s => s.baseValue <= targetTotalValue);
+          if (affordable.length === 0) break;
+          const sneaker = affordable[Math.floor(Math.random() * affordable.length)];
+          aiTradeOffer.push({ ...sneaker, id: Date.now() + Math.random() });
+          targetTotalValue -= sneaker.baseValue;
+        }
+      } else {
+        // --- DEFAULT LOGIC ---
+        if (aiMultiplier > 1.01) {
+          // Overpay: offer sneakers matching rarity and/or brand/model
+          offerPool = sneakersDatabase.filter(s => desiredRarities.includes(s.rarity) || currentTrader.preferences.some(pref => s.brand.includes(pref) || s.model?.includes(pref)));
+        } else if (aiMultiplier === 1.0) {
+          // Fair: offer sneakers matching only price
+          offerPool = sneakersDatabase.filter(s => s.baseValue >= minValue && s.baseValue <= maxValue);
+        } else {
+          // Underpay: offer anything affordable
+          offerPool = sneakersDatabase;
+        }
+        // Sort offerPool by value descending for more realistic overpay
+        offerPool = offerPool.sort((a, b) => b.baseValue - a.baseValue);
+        while (aiTradeOffer.length < 3 && offerPool.length > 0 && targetTotalValue > 0) {
+          const index = Math.floor(Math.random() * Math.min(offerPool.length, 10)); // bias toward higher value
+          const sneaker = offerPool[index];
+          if (sneaker.baseValue <= targetTotalValue) {
+            aiTradeOffer.push({ ...sneaker, id: Date.now() + Math.random() });
+            targetTotalValue -= sneaker.baseValue;
+            offerPool.splice(index, 1);
+          } else {
+            offerPool.splice(index, 1);
+          }
+        }
+        // Fill remaining slots with any affordable sneakers
+        while (aiTradeOffer.length < 3 && targetTotalValue > 0) {
+          const affordable = sneakersDatabase.filter(s => s.baseValue <= targetTotalValue);
+          if (affordable.length === 0) break;
+          const sneaker = affordable[Math.floor(Math.random() * affordable.length)];
+          aiTradeOffer.push({ ...sneaker, id: Date.now() + Math.random() });
+          targetTotalValue -= sneaker.baseValue;
+        }
       }
       updateTradeComparison();
       updateNegotiationOptions();
