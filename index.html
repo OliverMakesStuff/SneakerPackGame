@@ -2123,9 +2123,11 @@
         const event = activeEvents.get(sneaker.id);
         const valueChangeClass = event ? 
           (event.effect > 0 ? 'value-increase' : 'value-decrease') : '';
-
+        // Add lock visual and click handler
+        const isLocked = sneaker.locked;
         inventoryDiv.innerHTML += `
-          <div class="sneaker-card" data-sneaker-id="${sneaker.id}">
+          <div class="sneaker-card${isLocked ? ' locked' : ''}" data-sneaker-id="${sneaker.id}" onclick="toggleLockSneaker('${sneaker.id}')" style="position:relative;cursor:pointer;">
+            ${isLocked ? '<span style="position:absolute;top:6px;right:8px;font-size:1.3em;user-select:none;">🔒</span>' : ''}
             <img src="${sneaker.image}" alt="${sneaker.brand} ${sneaker.model}" style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto 8px auto;" />
             <strong>${sneaker.brand} ${sneaker.model}</strong>
             <span>${sneaker.colorway}</span>
@@ -2133,7 +2135,7 @@
             <span class="sneaker-value ${valueChangeClass}">
               Value: ${formatCurrency(Math.floor(value))} coins
             </span>
-            <br><button onclick="sellSneakerById('${sneaker.id}')" style="margin-top:8px;padding:5px 10px;">Sell</button>
+            <br><button onclick="event.stopPropagation();sellSneakerById('${sneaker.id}')" style="margin-top:8px;padding:5px 10px;">Sell</button>
           </div>
         `;
       });
@@ -2143,6 +2145,17 @@
         renderTradeDropdown();
       }
     }
+
+    // Add lock/unlock toggle function
+    function toggleLockSneaker(sneakerId) {
+      const idx = inventory.findIndex(s => String(s.id) === String(sneakerId));
+      if (idx === -1) return;
+      inventory[idx].locked = !inventory[idx].locked;
+      updateInventory();
+      saveGameState && saveGameState();
+    }
+
+ 
     function updateCoins() {
       const coinDisplay = document.getElementById('coin-count');
       const coinSidebar = document.getElementById('coin-count-sidebar');
@@ -4698,29 +4711,7 @@
       revealNextSneaker();
     }
 
-    function sellAllSneakers() {
-      if (inventory.length === 0) return;
-      let totalValue = 0;
-      inventory.forEach(sneaker => {
-        let value = (typeof sneaker.dynamicValue === "number" && !isNaN(sneaker.dynamicValue)) ? sneaker.dynamicValue : sneaker.baseValue;
-        // Apply any active event effects
-        activeEvents.forEach(event => {
-          if (event.sneaker === `${sneaker.brand} ${sneaker.model}`) {
-            value *= (1 + event.effect);
-          }
-        });
-        // Apply resell agent bonus
-        const bonus = 1 + (resellAgent.level * resellAgent.bonusPerLevel);
-        value = Math.floor(value * bonus);
-        totalValue += Math.floor(value * (1 + 0.10 * prestigeLevel));
-      });
-      coins += totalValue;
-      inventory = [];
-      updateCoins();
-      updateInventory();
-      showPurchaseNotification(`Sold all sneakers for ${formatCurrency(totalValue)} coins!`);
-    }
-
+  
     // --- While you were away function ---
     window.addEventListener('load', function() {
       try {
@@ -4773,6 +4764,21 @@
     window.addEventListener('beforeunload', function() {
       localStorage.setItem('lastVisitTimestamp', Date.now().toString());
     });
+
+    function sellAllSneakers() {
+      // Only sell sneakers that are not locked
+      let soldCount = 0;
+      // Use a copy to avoid index issues while removing
+      for (let i = inventory.length - 1; i >= 0; i--) {
+        if (!inventory[i].locked) {
+          sellSneaker(i);
+          soldCount++;
+        }
+      }
+      if (soldCount === 0) {
+        showPurchaseNotification("No unlocked sneakers to sell!", "error");
+      }
+    }
   </script>
 </body>
 </html>
