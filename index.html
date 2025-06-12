@@ -86,8 +86,8 @@
       height: 100%;
     }
     .casino-roll-card {
-      background-color: #34495e;
-      color: white;
+      background: #fff !important;
+      color: #2c3e50 !important;
       padding: 20px;
       border-radius: 8px;
       width: 180px;
@@ -98,10 +98,10 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 8px rgba(44,62,80,0.08);
       font-size: 1em;
       transition: box-shadow 0.2s, transform 0.2s;
-      }
+    }
     .casino-roll-card.selected {
       /* No border, no color change, no highlight */
       /* Just use normal card style */
@@ -1241,6 +1241,49 @@
       .sidebar-inventory { max-height: 120px; }
       .main-content h1 { font-size: 1.3em; }
     }
+
+    /* Only sneaker items have white background */
+    .sneaker-card, .used-sneaker, .offer-sneaker {
+      background: #fff !important;
+      color: #2c3e50 !important;
+      box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+    }
+
+    /* Remove white background from inventory containers */
+    .inventory-list-flex, .inventory-list, .inventory-grid {
+      background: initial !important;
+    }
+
+    /* In light mode, keep text dark on white */
+    body.light-mode .inventory-list-flex, 
+    body.light-mode .inventory-list, 
+    body.light-mode .inventory-grid, 
+    body.light-mode .sneaker-card, 
+    body.light-mode .used-sneaker, 
+    body.light-mode .offer-sneaker {
+      background: #fff !important;
+      color: #2c3e50 !important;
+    }
+
+    /* Remove any previous background for .sneaker-card */
+    .sneaker-card {
+      background: #fff !important;
+      color: #2c3e50 !important;
+    }
+
+    /* Make sneaker images larger in inventory, pack opening, and used market */
+    .sneaker-card img,
+    .casino-roll-card img,
+    .offer-sneaker img,
+    .used-sneaker img {
+      width: 90px !important;
+      height: 90px !important;
+      max-width: 90px !important;
+      max-height: 90px !important;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 12px auto;
+    }
   </style>
   <style>
     /* Prevent text and image selection */
@@ -1854,7 +1897,7 @@
         rollOptions.forEach((s, idx) => {
           const card = document.createElement("div");
           card.className = "casino-roll-card" + (idx === centerPos ? " selected" : "");
-          card.innerHTML = `<img src="${s.image}" alt="${s.brand} ${s.model}" style="width:60px;height:60px;object-fit:contain;display:block;margin:0 auto 8px auto;" />` +
+          card.innerHTML = `<img src="${s.image}" alt="${s.brand} ${s.model}" style="width:90px;height:90px;object-fit:contain;display:block;margin:0 auto 12px auto;" />` +
             `<strong>${s.brand} ${s.model}</strong><span>${s.colorway}</span><span class='rarity-${s.rarity}'>[${s.rarity.toUpperCase()}]</span>`;
           track.appendChild(card);
         });
@@ -1986,79 +2029,95 @@
     // Model to image URL mapping for specific models
     const modelImageMap = {
       // Nike Models
-      "Air Max 90": "https://postimg.cc/SJ9njJNh",
-      "Dunk Low": "https://postimg.cc/SJ9njJNh",
-      "Air Force 1": "https://postimg.cc/SJ9njJNh",
-      "SB Dunk": "https://postimg.cc/SJ9njJNh",
-      "Air Max 95": "https://postimg.cc/SJ9njJNh",
-      "Air Max 97": "https://postimg.cc/SJ9njJNh",
-      "Air Max 1": "https://postimg.cc/SJ9njJNh",
-      "Air Presto": "https://postimg.cc/SJ9njJNh",
-      "React Element": "https://postimg.cc/SJ9njJNh",
-      "Blazer Mid": "https://postimg.cc/SJ9njJNh",
-      "Cortez": "https://postimg.cc/SJ9njJNh",
-      "Waffle One": "https://postimg.cc/SJ9njJNh",
+      "Air Max 90": "https://images.stockx.com/images/Nike-Air-Max-90-Leather-Triple-White-2020-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Dunk Low": "https://images.stockx.com/images/Nike-Dunk-Low-Retro-White-Black-2021-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Air Force 1": "https://images.stockx.com/images/Nike-Air-Force-1-Low-White-07_V2-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "SB Dunk": "https://images.stockx.com/images/Nike-Dunk-Low-Pro-SB-Black-White-Gum-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Air Max 95": "https://images.stockx.com/images/Nike-Air-Max-95-OG-Neon-2025-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1743541430",
+      "Air Max 97": "https://images.stockx.com/images/Nike-Air-Max-1-97-Sean-Wotherspoon-NA-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Air Max 1": "https://images.stockx.com/images/Nike-Air-Max-1-SWOOSH-Low-Poly-Big-Head-Origins-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1743525680",
+      "Air Presto": "https://images.stockx.com/images/Nike-Air-Presto-Off-White-Black-2018-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "React Element": "https://images.stockx.com/images/Nike-React-Element-87-Sail-Light-Bone-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Blazer Mid": "https://images.stockx.com/images/Nike-Blazer-Mid-77-Vintage-White-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Cortez": "https://images.stockx.com/images/Nike-Cortez-TXT-Midnight-Navy.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1718661455",
+      "Waffle One": "https://images.stockx.com/images/Nike-Waffle-One-Summit-White-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
       // Adidas Models
-      "Yeezy Boost 350": "https://postimg.cc/SJ9njJNh",
-      "Superstar": "https://postimg.cc/SJ9njJNh",
-      "Ultra Boost": "https://postimg.cc/SJ9njJNh",
-      "NMD R1": "https://postimg.cc/SJ9njJNh",
-      "Forum Low": "https://postimg.cc/SJ9njJNh",
-      "Stan Smith": "https://postimg.cc/SJ9njJNh",
-      "Samba": "https://postimg.cc/SJ9njJNh",
-      "ZX 750": "https://postimg.cc/SJ9njJNh",
-      "Ozweego": "https://postimg.cc/SJ9njJNh",
-      "Campus": "https://postimg.cc/SJ9njJNh",
+      "Yeezy Boost 350": "https://images.stockx.com/images/adidas-Yeezy-Boost-350-V2-Pure-Oat-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Superstar": "https://images.stockx.com/images/adidas-Superstar-Core-Black-Cloud-White-Gold-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Ultra Boost": "https://images.stockx.com/images/adidas-Ultra-Boost-10-DNA-Triple-White-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "NMD R1": "https://images.stockx.com/images/adidas-NMD-R1-Primeblue-Triple-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Forum Low": "https://images.stockx.com/images/adidas-Forum-Low-CL-Cream-White-Dark-Blue-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1746047430",
+      "Stan Smith": "https://images.stockx.com/images/adidas-Stan-Smith-Core-White-New-Navy-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Samba": "https://images.stockx.com/images/adidas-Samba-OG-Cloud-White-Core-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "ZX 750": "https://images.stockx.com/images/adidas-ZX-750-Sky-Rush-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Ozweego": "https://images.stockx.com/images/adidas-Ozweego-Core-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Campus": "https://images.stockx.com/images/adidas-Campus-00s-Core-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
       // Jordan Models
-      "Retro 1": "https://postimg.cc/SJ9njJNh",
-      "Retro 3": "https://postimg.cc/SJ9njJNh",
-      "Retro 4": "https://postimg.cc/SJ9njJNh",
-      "Retro 5": "https://postimg.cc/SJ9njJNh",
-      "Retro 6": "https://postimg.cc/SJ9njJNh",
-      "Retro 11": "https://postimg.cc/SJ9njJNh",
-      "Retro 12": "https://postimg.cc/SJ9njJNh",
-      "Retro 13": "https://postimg.cc/SJ9njJNh",
-      "Legacy 312": "https://postimg.cc/SJ9njJNh",
-      "XXXV": "https://postimg.cc/SJ9njJNh",
+      "Retro 1": "https://images.stockx.com/images/Air-Jordan-1-Retro-High-OG-Chicago-Reimagined-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Retro 3": "https://images.stockx.com/images/Air-Jordan-3-Retro-Black-Cement-Reimagined-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Retro 4": "https://images.stockx.com/images/Air-Jordan-4-Retro-SB-Navy-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1740411181",
+      "Retro 5": "https://images.stockx.com/images/Air-Jordan-5-Retro-OG-Black-Metallic-Reimagined-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738617131",
+      "Retro 6": "https://images.stockx.com/images/Air-Jordan-6-Retro-Olympic-2024-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Retro 11": "https://images.stockx.com/images/Air-Jordan-11-Retro-DMP-Defining-Moments-2023-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Retro 12": "https://images.stockx.com/images/Air-Jordan-12-Retro-Flu-Game-2025-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1740684335",
+      "Retro 13": "https://images.stockx.com/images/Air-Jordan-13-Retro-Playoffs-2023-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Legacy 312": "https://images.stockx.com/images/Air-Jordan-Legacy-312-Low-Chicago-Red-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "XXXV": "https://images.stockx.com/images/Air-Jordan-XXXV-Bred-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
       // Luxury Models
-      "Triple S": "https://postimg.cc/SJ9njJNh",
-      "Speed Trainer": "https://postimg.cc/SJ9njJNh",
-      "Rhyton": "https://postimg.cc/SJ9njJNh",
-      "Ace": "https://postimg.cc/SJ9njJNh",
-      "Run Away": "https://postimg.cc/SJ9njJNh",
-      "B23 High": "https://postimg.cc/SJ9njJNh",
-      "Chain Reaction": "https://postimg.cc/SJ9njJNh",
-      "Oversized": "https://postimg.cc/SJ9njJNh",
-      "Wave": "https://postimg.cc/SJ9njJNh",
-      "Track": "https://postimg.cc/SJ9njJNh",
+      "Triple S": "https://images.stockx.com/images/Balenciaga-x-adidas-Triple-S-Fluo-Yellow-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Speed Trainer": "https://images.stockx.com/images/Balenciaga-Speed-Trainer-Black-White-2021-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Rhyton": "https://images.stockx.com/images/Gucci-Rython-Vintage-Logo-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Ace": "https://images.stockx.com/images/New-Balance-990v6-MiUSA-Action-Bronson-Amazonia-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1746133930",
+      "Run Away": "https://images.stockx.com/images/Louis-Vuitton-Run-Away-Iridescent-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "B23 High": "https://images.stockx.com/images/Dior-B23-High-Top-Logo-Oblique-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Chain Reaction": "https://images.stockx.com/images/Versace-Chain-Reaction-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Oversized": "https://images.stockx.com/images/Alexander-McQueen-Oversized-Ivory-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Wave": "https://images.stockx.com/images/adidas-Yeezy-Wave-Runner-700-Solid-Grey-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Track": "https://images.stockx.com/images/Balenciaga-Track-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
       // Classic Models
-      "Chuck Taylor": "https://postimg.cc/SJ9njJNh",
-      "Old Skool": "https://postimg.cc/SJ9njJNh",
-      "Sk8-Hi": "https://postimg.cc/SJ9njJNh",
-      "Era": "https://postimg.cc/SJ9njJNh",
-      "Authentic": "https://postimg.cc/SJ9njJNh",
-      "Club C 85": "https://postimg.cc/SJ9njJNh",
-      "Classic Leather": "https://postimg.cc/SJ9njJNh",
-      "Workout Plus": "https://postimg.cc/SJ9njJNh",
-      "550": "https://postimg.cc/SJ9njJNh",
-      "992": "https://postimg.cc/SJ9njJNh",
+      "Chuck Taylor": "https://images.stockx.com/images/Converse-Chuck-Taylor-All-Star-70s-Hi-Comme-des-Garcons-PLAY-White-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Old Skool": "https://images.stockx.com/images/Vans-Old-Skool-Black-White-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Sk8-Hi": "https://images.stockx.com/images/Vans-Sk8-Hi-Black-White-Product.png?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Era": "https://images.stockx.com/images/adidas-Ultra-Boost-10-DNA-Triple-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Authentic": "https://images.stockx.com/images/Vans-Authentic-Reissue-44-Gallery-Dept-Art-That-Kills-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1744837938",
+      "Club C 85": "https://images.stockx.com/images/Reebok-Club-C-85-TV-Chalk-Glen-Green-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Classic Leather": "https://images.stockx.com/images/Reebok-Classic-Leather-White-Mountaineering-Grey.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1743452332",
+      "Workout Plus": "https://images.stockx.com/images/Reebok-Workout-Plus-Black-Carbon.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1647058527",
+      "550": "https://images.stockx.com/images/New-Balance-550-White-Green-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "992": "https://images.stockx.com/images/New-Balance-992-MiUSA-Grey-Silver-Metallic-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1742925511",
       // Running/Athletic
-      "Gel Lyte III": "https://postimg.cc/SJ9njJNh",
-      "Kayano 5": "https://postimg.cc/SJ9njJNh",
-      "Jazz Original": "https://postimg.cc/SJ9njJNh",
-      "Triumph": "https://postimg.cc/SJ9njJNh",
-      "HOVR": "https://postimg.cc/SJ9njJNh",
-      "Fresh Foam": "https://postimg.cc/SJ9njJNh",
-      "Kinvara": "https://postimg.cc/SJ9njJNh",
-      "Endorphin": "https://postimg.cc/SJ9njJNh",
-      "Zoom Fly": "https://postimg.cc/SJ9njJNh",
-      "Pegasus": "https://postimg.cc/SJ9njJNh"
+      "Gel Lyte III": "https://images.stockx.com/images/ASICS-Gel-Lyte-III-Sean-Wotherspoon-x-atmos-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Kayano 5": "https://images.stockx.com/images/ASICS-Gel-Kayano-5-OG-Kith-Exclusive-White-Saffron-Updated.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1723520752",
+      "Jazz Original": "https://images.stockx.com/images/Saucony-Jazz-Original-Vintage-Sneaker-Carolina-Mustard-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Triumph": "https://images.stockx.com/images/Saucony-Triumph-22-White-Olivine.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1737100292",
+      "HOVR": "https://images.stockx.com/images/Under-Armour-HOVR-Summit-Fat-Tire-White-Enamel-Blue-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Fresh Foam": "https://images.stockx.com/images/New-Balance-Fresh-Foam-Trainer-Black-Cement.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1743103879",
+      "Kinvara": "https://images.stockx.com/images/Saucony-Kinvara-4-RE-COSTS-Meteorite-Sand.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1730802734",
+      "Endorphin": "https://images.stockx.com/images/Saucony-Endorphin-Elite-2-White-Peel-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1744664910",
+      "Zoom Fly": "https://images.stockx.com/images/Nike-Zoom-Fly-6-White-Pure-Platinum-Obsidian-Mist-Gridiron.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1741899064",
+      "Pegasus": "https://images.stockx.com/images/Nike-Air-Zoom-Pegasus-Premium-Black-Bright-Crimson-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1741979030"
+    };
+
+    // Model to Brand mapping
+    const modelToBrand = {
+      // Nike
+      "Air Max 90": "Nike", "Dunk Low": "Nike", "Air Force 1": "Nike", "SB Dunk": "Nike", "Air Max 95": "Nike", "Air Max 97": "Nike", "Air Max 1": "Nike", "Air Presto": "Nike", "React Element": "Nike", "Blazer Mid": "Nike", "Cortez": "Nike", "Waffle One": "Nike",
+      // Adidas
+      "Yeezy Boost 350": "Adidas", "Superstar": "Adidas", "Ultra Boost": "Adidas", "NMD R1": "Adidas", "Forum Low": "Adidas", "Stan Smith": "Adidas", "Samba": "Adidas", "ZX 750": "Adidas", "Ozweego": "Adidas", "Campus": "Adidas",
+      // Jordan
+      "Retro 1": "Jordan", "Retro 3": "Jordan", "Retro 4": "Jordan", "Retro 5": "Jordan", "Retro 6": "Jordan", "Retro 11": "Jordan", "Retro 12": "Jordan", "Retro 13": "Jordan", "Legacy 312": "Jordan", "XXXV": "Jordan",
+      // Luxury
+      "Triple S": "Balenciaga", "Speed Trainer": "Balenciaga", "Rhyton": "Gucci", "Ace": "Gucci", "Run Away": "Louis Vuitton", "B23 High": "Dior", "Chain Reaction": "Versace", "Oversized": "Alexander McQueen", "Wave": "Yeezy", "Track": "Balenciaga",
+      // Classic
+      "Chuck Taylor": "Converse", "Old Skool": "Vans", "Sk8-Hi": "Vans", "Era": "Vans", "Authentic": "Vans", "Club C 85": "Reebok", "Classic Leather": "Reebok", "Workout Plus": "Reebok", "550": "New Balance", "992": "New Balance",
+      // Running/Athletic
+      "Gel Lyte III": "Asics", "Kayano 5": "Asics", "Jazz Original": "Saucony", "Triumph": "Saucony", "HOVR": "Under Armour", "Fresh Foam": "New Balance", "Kinvara": "Saucony", "Endorphin": "Saucony", "Zoom Fly": "Nike", "Pegasus": "Nike"
     };
 
     // Instead of generating a fixed database, generate a random sneaker on demand
     function getRandomSneaker(rarity) {
-      const brand = brands[Math.floor(Math.random() * brands.length)];
       const model = models[Math.floor(Math.random() * models.length)];
+      const brand = modelToBrand[model] || "Unknown";
       const colorway = colorways[Math.floor(Math.random() * colorways.length)];
       let baseValue = 50;
       for (let r of rarities) {
@@ -2067,8 +2126,8 @@
           break;
         }
       }
-      // Use mapped image if available, otherwise fallback to robohash
-      const image = modelImageMap[model] || `https://robohash.org/${encodeURIComponent(brand + '-' + model + '-' + colorway)}.png?set=set4`;
+      // Use mapped image if available, otherwise fallback to robohash using only the model name
+      const image = modelImageMap[model] || `https://robohash.org/${encodeURIComponent(model)}.png?set=set4`;
       return {
         id: Date.now() + Math.random(),
         brand,
@@ -2204,7 +2263,7 @@
         inventoryDiv.innerHTML += `
           <div class="sneaker-card${isLocked ? ' locked' : ''}" data-sneaker-id="${sneaker.id}" onclick="toggleLockSneaker('${sneaker.id}')" style="position:relative;cursor:pointer;">
             ${isLocked ? '<span style="position:absolute;top:6px;right:8px;font-size:1.3em;user-select:none;">🔒</span>' : ''}
-            <img src="${sneaker.image}" alt="${sneaker.brand} ${sneaker.model}" style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto 8px auto;" />
+            <img src="${sneaker.image}" alt="${sneaker.brand} ${sneaker.model}" style="width:90px;height:90px;object-fit:contain;display:block;margin:0 auto 12px auto;" />
             <strong>${sneaker.brand} ${sneaker.model}</strong>
             <span>${sneaker.colorway}</span>
             <span class="rarity-${sneaker.rarity}">[${sneaker.rarity.toUpperCase()}]</span><br>
@@ -2566,7 +2625,7 @@
         rollOptions.forEach((s, idx) => {
           const card = document.createElement("div");
           card.className = "casino-roll-card" + (idx === centerPos ? " selected" : "");
-          card.innerHTML = `<img src="${s.image}" alt="${s.brand} ${s.model}" style="width:60px;height:60px;object-fit:contain;display:block;margin:0 auto 8px auto;" />` +
+          card.innerHTML = `<img src="${s.image}" alt="${s.brand} ${s.model}" style="width:90px;height:90px;object-fit:contain;display:block;margin:0 auto 12px auto;" />` +
             `<strong>${s.brand} ${s.model}</strong><span>${s.colorway}</span><span class='rarity-${s.rarity}'>[${s.rarity.toUpperCase()}]</span>`;
           track.appendChild(card);
         });
@@ -2823,23 +2882,45 @@
       const playerHasGrail = yourSneakers.some(s => s.rarity === 'grail');
       const aiHighValue = currentTrader.valuePreference === 'high' || currentTrader.valuePreference === 'ultra';
 
+      // Prevent AI from offering sneakers the player is offering
+      const playerSneakerKeys = yourSneakers.map(s => `${s.brand}|${s.model}|${s.colorway}|${s.rarity}`);
+
       // Determine desired rarity and price range for this trader
       let desiredRarities = [];
+      let aiMultiplier = 0.6; // Default to underpay
+      let overpay = 0;
+      let offerPool = [];
+      let allowGrail = false;
+      let maxRarity = 'epic';
+
       switch(currentTrader.valuePreference) {
         case 'high':
-          desiredRarities = ['legendary', 'grail', 'mythic'];
+          desiredRarities = ['legendary', 'grail', 'mythic', 'epic', 'ultra-rare', 'rare'];
+          aiMultiplier = 1.0 + Math.random() * 0.15; // up to 15% overpay
+          allowGrail = true;
+          maxRarity = 'grail';
           break;
         case 'ultra':
-          desiredRarities = ['legendary', 'epic', 'grail', 'mythic'];
+          desiredRarities = ['legendary', 'grail', 'mythic', 'epic', 'ultra-rare', 'rare'];
+          aiMultiplier = 1.05 + Math.random() * 0.15; // up to 20% overpay
+          allowGrail = true;
+          maxRarity = 'grail';
           break;
         case 'medium':
-          desiredRarities = ['epic', 'rare', 'ultra-rare'];
+          desiredRarities = ['epic', 'rare', 'ultra-rare', 'uncommon'];
+          aiMultiplier = 0.8 + Math.random() * 0.25; // 0.8–1.05 (rarely overpay)
+          allowGrail = false;
+          maxRarity = 'epic';
           break;
         case 'low':
         default:
-          desiredRarities = ['common', 'uncommon'];
+          desiredRarities = ['common', 'uncommon', 'rare'];
+          aiMultiplier = 0.5 + Math.random() * 0.4; // 0.5–0.9 (always underpay)
+          allowGrail = false;
+          maxRarity = 'rare';
           break;
       }
+
       const minValue = currentTrader.additionalPreferences?.minValue ?? 0;
       const maxValue = currentTrader.additionalPreferences?.maxValue ?? Infinity;
 
@@ -2853,99 +2934,115 @@
         if (currentTrader.preferences.some(pref => s.brand.includes(pref) || s.model?.includes(pref))) hasBrandMatch = true;
       });
 
-      // Decide multiplier
-      let aiMultiplier = 0.6; // Default to underpay
-      let overpay = 0;
       // For high-value trades, AI should never underpay and should often overpay
-      if (yourTotalValue >= 4000) {
-        aiMultiplier = 1.0 + Math.random() * 0.25; // Always fair or up to 25% overpay
-        if (hasRarityMatch || hasBrandMatch) aiMultiplier += 0.10; // Encourage overpay for good matches
-      } else if (hasRarityMatch) {
-        overpay = 0.10 + Math.random() * 0.20; // 10-30% overpay
-        if (hasBrandMatch) overpay += 0.10; // +10% if brand/model matches
-        aiMultiplier = 1 + overpay;
-      } else if (hasPriceMatch) {
-        aiMultiplier = 1.0; // Fair if any price match
+      if ((currentTrader.valuePreference === 'high' || currentTrader.valuePreference === 'ultra') && yourTotalValue >= 4000) {
+        aiMultiplier = Math.max(aiMultiplier, 1.0 + Math.random() * 0.10);
       }
-      // Never underpay for high-value trades
-      if (yourTotalValue >= 4000 && aiMultiplier < 1.0) aiMultiplier = 1.0;
+      // For low/medium, never overpay for high-value trades
+      if ((currentTrader.valuePreference === 'low' || currentTrader.valuePreference === 'medium') && yourTotalValue >= 4000) {
+        aiMultiplier = Math.min(aiMultiplier, 1.0);
+      }
 
       let targetTotalValue = yourTotalValue * adjustment * aiMultiplier;
 
       // --- GRAIL TRADE ENFORCEMENT ---
       aiTradeOffer = [];
-      let offerPool = [];
-      if (playerHasGrail && aiHighValue) {
+      if (playerHasGrail && aiHighValue && allowGrail) {
         // AI must overpay and must offer at least one grail
-        offerPool = sneakersDatabase.filter(s => s.rarity === 'grail');
+        offerPool = sneakersDatabase.filter(s => s.rarity === 'grail' && !playerSneakerKeys.includes(`${s.brand}|${s.model}|${s.colorway}|${s.rarity}`));
         // If not enough grails, fill with next highest rarities
         if (offerPool.length === 0) {
-          offerPool = sneakersDatabase.filter(s => ['legendary', 'mythic', 'epic'].includes(s.rarity));
+          offerPool = sneakersDatabase.filter(s => ['legendary', 'mythic', 'epic'].includes(s.rarity) && !playerSneakerKeys.includes(`${s.brand}|${s.model}|${s.colorway}|${s.rarity}`));
         }
         // Sort by value descending
         offerPool = offerPool.sort((a, b) => b.baseValue - a.baseValue);
         // Always try to include at least one grail if possible
         let grailAdded = false;
+        const usedKeys = new Set();
         for (let i = 0; i < offerPool.length && aiTradeOffer.length < 3 && targetTotalValue > 0; i++) {
           const sneaker = offerPool[i];
+          const key = `${sneaker.brand}|${sneaker.model}|${sneaker.colorway}|${sneaker.rarity}`;
+          if (usedKeys.has(key)) continue;
           if (!grailAdded && sneaker.rarity === 'grail') {
             aiTradeOffer.push({ ...sneaker, id: Date.now() + Math.random() });
             targetTotalValue -= sneaker.baseValue;
             grailAdded = true;
+            usedKeys.add(key);
           } else if (grailAdded && sneaker.baseValue <= targetTotalValue) {
             aiTradeOffer.push({ ...sneaker, id: Date.now() + Math.random() });
             targetTotalValue -= sneaker.baseValue;
+            usedKeys.add(key);
           }
         }
-        // If less than 3, fill with any high value sneakers
+        // If less than 3, fill with any high value sneakers (no duplicates)
         if (aiTradeOffer.length < 3) {
-          let fillPool = sneakersDatabase.filter(s => s.baseValue <= targetTotalValue && s.rarity !== 'common' && s.rarity !== 'uncommon');
+          let fillPool = sneakersDatabase.filter(s => s.baseValue <= targetTotalValue && s.rarity !== 'common' && s.rarity !== 'uncommon' && !playerSneakerKeys.includes(`${s.brand}|${s.model}|${s.colorway}|${s.rarity}`));
           fillPool = fillPool.sort((a, b) => b.baseValue - a.baseValue);
           for (let i = 0; i < fillPool.length && aiTradeOffer.length < 3 && targetTotalValue > 0; i++) {
-            aiTradeOffer.push({ ...fillPool[i], id: Date.now() + Math.random() });
-            targetTotalValue -= fillPool[i].baseValue;
+            const sneaker = fillPool[i];
+            const key = `${sneaker.brand}|${sneaker.model}|${sneaker.colorway}|${sneaker.rarity}`;
+            if (usedKeys.has(key)) continue;
+            aiTradeOffer.push({ ...sneaker, id: Date.now() + Math.random() });
+            targetTotalValue -= sneaker.baseValue;
+            usedKeys.add(key);
           }
         }
-        // Defensive: if still not enough, fill with anything affordable
+        // Defensive: if still not enough, fill with anything affordable (no duplicates)
         while (aiTradeOffer.length < 3 && targetTotalValue > 0) {
-          const affordable = sneakersDatabase.filter(s => s.baseValue <= targetTotalValue);
+          const affordable = sneakersDatabase.filter(s => s.baseValue <= targetTotalValue && !playerSneakerKeys.includes(`${s.brand}|${s.model}|${s.colorway}|${s.rarity}`));
           if (affordable.length === 0) break;
           const sneaker = affordable[Math.floor(Math.random() * affordable.length)];
+          const key = `${sneaker.brand}|${sneaker.model}|${sneaker.colorway}|${sneaker.rarity}`;
+          if (usedKeys.has(key)) continue;
           aiTradeOffer.push({ ...sneaker, id: Date.now() + Math.random() });
           targetTotalValue -= sneaker.baseValue;
+          usedKeys.add(key);
         }
       } else {
         // --- DEFAULT LOGIC ---
+        // Restrict offer pool by maxRarity
+        const rarityOrder = ["common","uncommon","rare","ultra-rare","epic","mythic","legendary","grail"];
+        const maxRarityIndex = rarityOrder.indexOf(maxRarity);
+        offerPool = sneakersDatabase.filter(s =>
+          rarityOrder.indexOf(s.rarity) <= maxRarityIndex &&
+          !playerSneakerKeys.includes(`${s.brand}|${s.model}|${s.colorway}|${s.rarity}`)
+        );
+        // Further filter by desiredRarities and preferences for overpay/fair
         if (aiMultiplier > 1.01) {
-          // Overpay: offer sneakers matching rarity and/or brand/model
-          offerPool = sneakersDatabase.filter(s => desiredRarities.includes(s.rarity) || currentTrader.preferences.some(pref => s.brand.includes(pref) || s.model?.includes(pref)));
-        } else if (aiMultiplier === 1.0) {
-          // Fair: offer sneakers matching only price
-          offerPool = sneakersDatabase.filter(s => s.baseValue >= minValue && s.baseValue <= maxValue);
-        } else {
-          // Underpay: offer anything affordable
-          offerPool = sneakersDatabase;
+          offerPool = offerPool.filter(s => desiredRarities.includes(s.rarity) || currentTrader.preferences.some(pref => s.brand.includes(pref) || s.model?.includes(pref)));
+        } else if (aiMultiplier >= 0.95) {
+          offerPool = offerPool.filter(s => s.baseValue >= minValue && s.baseValue <= maxValue);
         }
         // Sort offerPool by value descending for more realistic overpay
         offerPool = offerPool.sort((a, b) => b.baseValue - a.baseValue);
+        const usedKeys = new Set();
         while (aiTradeOffer.length < 3 && offerPool.length > 0 && targetTotalValue > 0) {
           const index = Math.floor(Math.random() * Math.min(offerPool.length, 10)); // bias toward higher value
           const sneaker = offerPool[index];
-          if (sneaker.baseValue <= targetTotalValue) {
-            aiTradeOffer.push({ ...sneaker, id: Date.now() + Math.random() });
-            targetTotalValue -= sneaker.baseValue;
+          const key = `${sneaker.brand}|${sneaker.model}|${sneaker.colorway}|${sneaker.rarity}`;
+          if (usedKeys.has(key)) {
             offerPool.splice(index, 1);
-          } else {
-            offerPool.splice(index, 1);
+            continue;
           }
-        }
-        // Fill remaining slots with any affordable sneakers
-        while (aiTradeOffer.length < 3 && targetTotalValue > 0) {
-          const affordable = sneakersDatabase.filter(s => s.baseValue <= targetTotalValue);
-          if (affordable.length === 0) break;
-          const sneaker = affordable[Math.floor(Math.random() * affordable.length)];
           aiTradeOffer.push({ ...sneaker, id: Date.now() + Math.random() });
           targetTotalValue -= sneaker.baseValue;
+          usedKeys.add(key);
+          offerPool.splice(index, 1);
+        }
+        // Fill remaining slots with any affordable sneakers (no duplicates)
+        while (aiTradeOffer.length < 3 && targetTotalValue > 0) {
+          const affordable = sneakersDatabase.filter(s =>
+            rarityOrder.indexOf(s.rarity) <= maxRarityIndex &&
+            s.baseValue <= targetTotalValue &&
+            !playerSneakerKeys.includes(`${s.brand}|${s.model}|${s.colorway}|${s.rarity}`)
+          );
+          if (affordable.length === 0) break;
+          const sneaker = affordable[Math.floor(Math.random() * affordable.length)];
+          const key = `${sneaker.brand}|${sneaker.model}|${sneaker.colorway}|${sneaker.rarity}`;
+          if (usedKeys.has(key)) continue;
+          aiTradeOffer.push({ ...sneaker, id: Date.now() + Math.random() });
+          targetTotalValue -= sneaker.baseValue;
+          usedKeys.add(key);
         }
       }
       updateTradeComparison();
@@ -3157,7 +3254,7 @@
           <div class="limited-offer">
             <div class="offer-timer">${timeString}</div>
             <div class="offer-sneaker">
-              <img src="${offer.sneaker.image}" alt="${offer.sneaker.brand} ${offer.sneaker.model}" style="width:60px;height:60px;object-fit:contain;display:block;margin:0 auto 8px auto;" />
+              <img src="${offer.sneaker.image}" alt="${offer.sneaker.brand} ${offer.sneaker.model}" style="width:90px;height:90px;object-fit:contain;display:block;margin:0 auto 12px auto;" />
               <strong>${offer.sneaker.brand} ${offer.sneaker.model}</strong>
               <div>${offer.sneaker.colorway}</div>
               <div class="rarity-${offer.sneaker.rarity}">[${offer.sneaker.rarity.toUpperCase()}]</div>
@@ -4004,7 +4101,7 @@
         
         usedMarket.innerHTML += `
           <div class="used-sneaker">
-            <img src="${sneaker.image}" alt="${sneaker.brand} ${sneaker.model}" style="width:60px;height:60px;object-fit:contain;display:block;margin:0 auto 8px auto;" />
+            <img src="${sneaker.image}" alt="${sneaker.brand} ${sneaker.model}" style="width:90px;height:90px;object-fit:contain;display:block;margin:0 auto 12px auto;" />
             <strong>${sneaker.brand} ${sneaker.model}</strong>
             <div>${sneaker.colorway}</div>
             <div class="rarity-${sneaker.rarity}">[${sneaker.rarity.toUpperCase()}]</div>
@@ -4727,7 +4824,7 @@
       const cardContainer = document.getElementById("card-container");
       cardContainer.innerHTML = `<div style='display:flex;flex-wrap:wrap;justify-content:center;gap:12px;'>${allSneakers.map(s => `
         <div class='sneaker-card' style='background:#34495e;padding:10px;border-radius:8px;min-width:120px;max-width:140px;'>
-          <img src='${s.image}' alt='${s.brand} ${s.model}' style='width:60px;height:60px;object-fit:contain;display:block;margin:0 auto 8px auto;' />
+          <img src='${s.image}' alt='${s.brand} ${s.model}' style='width:90px;height:90px;object-fit:contain;display:block;margin:0 auto 12px auto;' />
           <strong>${s.brand} ${s.model}</strong><br>
           <span>${s.colorway}</span><br>
           <span class='rarity-${s.rarity}'>[${s.rarity.toUpperCase()}]</span>
