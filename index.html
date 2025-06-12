@@ -1334,7 +1334,6 @@
               <option value="3">Open 3x</option>
               <option value="5">Open 5x</option>
               <option value="10">Open 10x</option>
-              <option value="100">Open 100x</option>
             </select>
             <button class="pack-button" onclick="openPackDropdown()">Open Pack</button>
             <button class="pack-button" style="margin-left:8px;" onclick="previewPack()">Pack Preview</button>
@@ -1984,6 +1983,78 @@
       { rarity: "grail", weight: 0.1, value: [2500, 7000] }
     ];
 
+    // Model to image URL mapping for specific models
+    const modelImageMap = {
+      // Nike Models
+      "Air Max 90": "https://images.stockx.com/images/Nike-Air-Max-90-Leather-Triple-White-2020-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Dunk Low": "https://images.stockx.com/images/Nike-Dunk-Low-Retro-White-Black-2021-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Air Force 1": "https://images.stockx.com/images/Nike-Air-Force-1-Low-White-07_V2-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "SB Dunk": "https://images.stockx.com/images/Nike-Dunk-Low-Pro-SB-Black-White-Gum-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Air Max 95": "https://images.stockx.com/images/Nike-Air-Max-95-OG-Neon-2025-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1743541430",
+      "Air Max 97": "https://images.stockx.com/images/Nike-Air-Max-1-97-Sean-Wotherspoon-NA-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Air Max 1": "https://images.stockx.com/images/Nike-Air-Max-1-SWOOSH-Low-Poly-Big-Head-Origins-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1743525680",
+      "Air Presto": "https://images.stockx.com/images/Nike-Air-Presto-Off-White-Black-2018-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "React Element": "https://images.stockx.com/images/Nike-React-Element-87-Sail-Light-Bone-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Blazer Mid": "https://images.stockx.com/images/Nike-Blazer-Mid-77-Vintage-White-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Cortez": "https://images.stockx.com/images/Nike-Cortez-TXT-Midnight-Navy.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1718661455",
+      "Waffle One": "https://images.stockx.com/images/Nike-Waffle-One-Summit-White-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      // Adidas Models
+      "Yeezy Boost 350": "https://images.stockx.com/images/adidas-Yeezy-Boost-350-V2-Pure-Oat-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Superstar": "https://images.stockx.com/images/adidas-Superstar-Core-Black-Cloud-White-Gold-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Ultra Boost": "https://images.stockx.com/images/adidas-Ultra-Boost-10-DNA-Triple-White-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "NMD R1": "https://images.stockx.com/images/adidas-NMD-R1-Primeblue-Triple-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Forum Low": "https://images.stockx.com/images/adidas-Forum-Low-CL-Cream-White-Dark-Blue-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1746047430",
+      "Stan Smith": "https://images.stockx.com/images/adidas-Stan-Smith-Core-White-New-Navy-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Samba": "https://images.stockx.com/images/adidas-Samba-OG-Cloud-White-Core-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "ZX 750": "https://images.stockx.com/images/adidas-ZX-750-Sky-Rush-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Ozweego": "https://images.stockx.com/images/adidas-Ozweego-Core-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Campus": "https://images.stockx.com/images/adidas-Campus-00s-Core-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      // Jordan Models
+      "Retro 1": "https://images.stockx.com/images/Air-Jordan-1-Retro-High-OG-Chicago-Reimagined-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Retro 3": "https://images.stockx.com/images/Air-Jordan-3-Retro-Black-Cement-Reimagined-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Retro 4": "https://images.stockx.com/images/Air-Jordan-4-Retro-SB-Navy-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1740411181",
+      "Retro 5": "https://images.stockx.com/images/Air-Jordan-5-Retro-OG-Black-Metallic-Reimagined-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738617131",
+      "Retro 6": "https://images.stockx.com/images/Air-Jordan-6-Retro-Olympic-2024-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Retro 11": "https://images.stockx.com/images/Air-Jordan-11-Retro-DMP-Defining-Moments-2023-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Retro 12": "https://images.stockx.com/images/Air-Jordan-12-Retro-Flu-Game-2025-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1740684335",
+      "Retro 13": "https://images.stockx.com/images/Air-Jordan-13-Retro-Playoffs-2023-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Legacy 312": "https://images.stockx.com/images/Air-Jordan-Legacy-312-Low-Chicago-Red-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "XXXV": "https://images.stockx.com/images/Air-Jordan-XXXV-Bred-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      // Luxury Models
+      "Triple S": "https://images.stockx.com/images/Balenciaga-x-adidas-Triple-S-Fluo-Yellow-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Speed Trainer": "https://images.stockx.com/images/Balenciaga-Speed-Trainer-Black-White-2021-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Rhyton": "https://images.stockx.com/images/Gucci-Rython-Vintage-Logo-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Ace": "https://images.stockx.com/images/New-Balance-990v6-MiUSA-Action-Bronson-Amazonia-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1746133930",
+      "Run Away": "https://images.stockx.com/images/Louis-Vuitton-Run-Away-Iridescent-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "B23 High": "https://images.stockx.com/images/Dior-B23-High-Top-Logo-Oblique-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Chain Reaction": "https://images.stockx.com/images/Versace-Chain-Reaction-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Oversized": "https://images.stockx.com/images/Alexander-McQueen-Oversized-Ivory-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Wave": "https://images.stockx.com/images/adidas-Yeezy-Wave-Runner-700-Solid-Grey-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Track": "https://images.stockx.com/images/Balenciaga-Track-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      // Classic Models
+      "Chuck Taylor": "https://images.stockx.com/images/Converse-Chuck-Taylor-All-Star-70s-Hi-Comme-des-Garcons-PLAY-White-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Old Skool": "https://images.stockx.com/images/Vans-Old-Skool-Black-White-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Sk8-Hi": "https://images.stockx.com/images/Vans-Sk8-Hi-Black-White-Product.png?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Era": "https://images.stockx.com/images/adidas-Ultra-Boost-10-DNA-Triple-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Authentic": "https://images.stockx.com/images/Vans-Authentic-Reissue-44-Gallery-Dept-Art-That-Kills-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1744837938",
+      "Club C 85": "https://images.stockx.com/images/Reebok-Club-C-85-TV-Chalk-Glen-Green-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Classic Leather": "https://images.stockx.com/images/Reebok-Classic-Leather-White-Mountaineering-Grey.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1743452332",
+      "Workout Plus": "https://images.stockx.com/images/Reebok-Workout-Plus-Black-Carbon.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1647058527",
+      "550": "https://images.stockx.com/images/New-Balance-550-White-Green-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "992": "https://images.stockx.com/images/New-Balance-992-MiUSA-Grey-Silver-Metallic-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1742925511",
+      // Running/Athletic
+      "Gel Lyte III": "https://images.stockx.com/images/ASICS-Gel-Lyte-III-Sean-Wotherspoon-x-atmos-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Kayano 5": "https://images.stockx.com/images/ASICS-Gel-Kayano-5-OG-Kith-Exclusive-White-Saffron-Updated.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1723520752",
+      "Jazz Original": "https://images.stockx.com/images/Saucony-Jazz-Original-Vintage-Sneaker-Carolina-Mustard-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Triumph": "https://images.stockx.com/images/Saucony-Triumph-22-White-Olivine.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1737100292",
+      "HOVR": "https://images.stockx.com/images/Under-Armour-HOVR-Summit-Fat-Tire-White-Enamel-Blue-Black-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1738193358",
+      "Fresh Foam": "https://images.stockx.com/images/New-Balance-Fresh-Foam-Trainer-Black-Cement.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1743103879",
+      "Kinvara": "https://images.stockx.com/images/Saucony-Kinvara-4-RE-COSTS-Meteorite-Sand.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1730802734",
+      "Endorphin": "https://images.stockx.com/images/Saucony-Endorphin-Elite-2-White-Peel-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1744664910",
+      "Zoom Fly": "https://images.stockx.com/images/Nike-Zoom-Fly-6-White-Pure-Platinum-Obsidian-Mist-Gridiron.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1741899064",
+      "Pegasus": "https://images.stockx.com/images/Nike-Air-Zoom-Pegasus-Premium-Black-Bright-Crimson-Product.jpg?fit=fill&bg=FFFFFF&w=140&h=75&q=57&dpr=2&trim=color&updated_at=1741979030"
+    };
+
     // Instead of generating a fixed database, generate a random sneaker on demand
     function getRandomSneaker(rarity) {
       const brand = brands[Math.floor(Math.random() * brands.length)];
@@ -1996,6 +2067,8 @@
           break;
         }
       }
+      // Use mapped image if available, otherwise fallback to robohash
+      const image = modelImageMap[model] || `https://robohash.org/${encodeURIComponent(brand + '-' + model + '-' + colorway)}.png?set=set4`;
       return {
         id: Date.now() + Math.random(),
         brand,
@@ -2003,7 +2076,7 @@
         colorway,
         rarity,
         baseValue,
-        image: `https://robohash.org/${encodeURIComponent(brand + '-' + model + '-' + colorway)}.png?set=set4`
+        image
       };
     }
 
@@ -4696,24 +4769,7 @@
       document.querySelectorAll('.pack-button, .pack-select').forEach(btn => {
         btn.disabled = true;
       });
-      if (count === 100) {
-        // Skip animation, instantly add all sneakers to inventory
-        let allSneakers = [];
-        for (let i = 0; i < count * 3; i++) {
-          let sneaker = rollSneaker(type);
-          if (sneaker.rarity === 'grail') sneaker.locked = true;
-          allSneakers.push(sneaker);
-        }
-        inventory.push(...allSneakers);
-        addPurchaseToHistory(`100x Pack Opening`, totalCost, allSneakers);
-        updateInventory();
-        showPurchaseNotification("Opened 100 packs! 300 sneakers added to inventory.");
-        // Re-enable buttons
-        document.querySelectorAll('.pack-button, .pack-select').forEach(btn => {
-          btn.disabled = false;
-        });
-        return;
-      }
+      // Remove 100x instant logic, always show modal for all counts
       // Show the modal
       const packModal = document.getElementById("pack-modal");
       const modalOverlay = document.getElementById("modal-overlay");
